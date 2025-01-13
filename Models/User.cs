@@ -10,14 +10,15 @@ namespace ExpenseTracker.Models
 {
     public class User
     {
-        [Required]
-        [StringLength(8, ErrorMessage = "Name length can't be more than 8.")]
+        [Required(ErrorMessage = "Username cannot be empty.")]
+        [StringLength(15, MinimumLength = 5, ErrorMessage = "Username must be 5 to 15 characters long.")]
         public string Username { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Password cannot be empty.")]
+        [StringLength(15, MinimumLength = 8, ErrorMessage = "Password must be 5 to 15 characters long.")]
         public string Password { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "A currency must be selected.")]
         public string PreferredCurrency { get; set; }
 
         public User(string Username, string Password, string PreferredCurrency)

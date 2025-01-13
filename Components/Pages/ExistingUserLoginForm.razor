@@ -1,0 +1,45 @@
+﻿@using ExpenseTracker.Models
+@using ExpenseTracker.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using MudBlazor
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<MudForm>
+
+    <MudTextField T="string" Label="Username" Required="true" RequiredError="Username is required." @bind-Value="username" />
+    <MudTextField T="string" Label="Password" Required="true" RequiredError="Password is required." @bind-Value="password" />
+
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Class="ml-auto" OnClick="HandleLogin">Login</MudButton>
+
+</MudForm>
+
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p>@errorMessage</p>
+}
+
+@code {
+    private string username;
+    private string password;
+    private string errorMessage = string.Empty;
+
+    // Handle login logic
+    private void HandleLogin()
+    {
+        bool isValid = AuthService.ValidateUser(username, password);
+
+        // Successful login
+        if (isValid)
+        {
+            // Navigate to dashboard
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        else
+        {
+            // Invalid login (user credentials don't match)
+            errorMessage = "Invalid username or password.";
+        }
+    }
+}

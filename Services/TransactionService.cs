@@ -12,7 +12,7 @@ namespace ExpenseTracker.Services
 {
     public class TransactionService : ITransactionService
     {
-        private readonly string _filePath = Path.Combine(FileSystem.Current.CacheDirectory, "transactions.json");
+        private readonly string _filePath = Path.Combine(FileSystem.Current.AppDataDirectory, "transactions.json");
 
         private List<Transaction> _transactions = new List<Transaction>();
 

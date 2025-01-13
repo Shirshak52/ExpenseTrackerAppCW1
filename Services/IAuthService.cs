@@ -14,5 +14,8 @@ namespace ExpenseTracker.Services
         public void SaveUser(string Username, string Password, string PreferredCurrency);
 
         public User GetUserFromFile();
+
+
+        public bool UserExists();
     }
 }
