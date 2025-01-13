@@ -7,8 +7,8 @@
 
 <MudForm>
 
-    <MudTextField T="string" Label="Username" Required="true" RequiredError="Username is required." @bind-Value="username" />
-    <MudTextField T="string" Label="Password" Required="true" RequiredError="Password is required." @bind-Value="password" />
+    <MudTextField T="string" Label="Username" Required="true" RequiredError="Username is mandatory." @bind-Value="username" />
+    <MudTextField T="string" Label="Password" Required="true" RequiredError="Password is mandatory." @bind-Value="password" />
 
     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Class="ml-auto" OnClick="HandleLogin">Login</MudButton>
 
