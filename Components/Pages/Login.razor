@@ -1,0 +1,77 @@
+﻿@page "/"
+@using ExpenseTracker.Models
+@using ExpenseTracker.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using MudBlazor
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+
+<h1>Login</h1>
+
+<EditForm Model="@user" OnValidSubmit="HandleLogin">
+
+    <MudTextField @bind-Value="@user.Username" Label="Username" Variant="Variant.Text"></MudTextField>
+    <MudTextField @bind-Value="@user.Password" Label="Password" Variant="Variant.Text"></MudTextField>
+
+    @if (isNewUser)
+    {
+        <MudTextField @bind-Value="@user.PreferredCurrency" Label="Preferred Currency" Variant="Variant.Text"></MudTextField>
+    }
+
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Class="ml-auto">Login</MudButton>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p>errorMessage</p>
+    }
+</EditForm>
+
+@code {
+    private User user = new User();
+    private bool isNewUser = false;
+    private string errorMessage = string.Empty;
+
+    // Handle login logic
+    private void HandleLogin()
+    {
+        bool isValid = AuthService.ValidateUser(user.Username, user.Password);
+
+        // Successful login
+        if (isValid)
+        {
+            // Navigate to dashboard
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        else
+        {
+            // Check if the user exists in the file
+            var existingUser = AuthService.GetUserFromFile();
+
+            // If it iss a new user
+            if (existingUser == null)
+            {
+                isNewUser = true; // Display the input field for preferred currecy, hide the login form
+                errorMessage = string.Empty; // Clear previous error message
+            }
+            else
+            {
+                // Invalid login (user credentials don't match)
+                errorMessage = "Invalid username or password.";
+            }
+        }
+    }
+
+    // Save the new user's details and navigate to the dashboard
+    private void SaveUser()
+    {
+        if (isNewUser && !string.IsNullOrEmpty(user.PreferredCurrency))
+        {
+            // Save the new user's details
+            AuthService.SaveUser(user.Username, user.Password, user.PreferredCurrency);
+
+            // After saving, navigate to the dashboard
+            NavigationManager.NavigateTo("/dashboard");
+        }
+    }
+}

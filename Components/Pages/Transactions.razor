@@ -1,0 +1,180 @@
+﻿@* @page "/transactions" *@
+@* @using ExpenseTrackerApp.Models; *@
+@* @using ExpenseTrackerApp.Services; *@
+@* @inject ITransactionService TransactionService; *@
+
+@* @using Microsoft.AspNetCore.Components.Forms; *@
+
+
+@* <h1>My Transactions</h1> *@
+
+@* <!-- Transactions View Start --> *@
+@* <div>	 *@
+@* 	<div> *@
+@* 		<button class="btn btn-secondary" @onclick="SortByDate"> *@
+@* 			Sort by Date <i class="bi @(isSortedByDateAscending ? "bi-caret-up-fill" : "bi-caret-down-fill")"></i> *@
+@* 		</button> *@
+
+@* 		<table class="table table-striped"> *@
+@* 			<thead> *@
+@* 				<tr> *@
+@* 					<th scope="col">Title</th> *@
+@* 					<th scope="col">Type</th> *@
+@* 					<th scope="col">Amount</th> *@
+@* 					<th scope="col">Date</th> *@
+@* 					<th scope="col">Tag</th> *@
+@* 					<th scope="col">Notes</th> *@
+@* 				</tr> *@
+@* 			</thead> *@
+
+@* 			<!-- Display all transactions --> *@
+@* 			<tbody> *@
+@* 				@foreach (var transaction in transactions) *@
+@* 				{ *@
+@* 					<tr> *@
+@* 						<td>@transaction.Title</td> *@
+@* 						<td>@transaction.Type</td> *@
+@* 						<td>@transaction.Amount</td> *@
+@* 						<td>@transaction.Date</td> *@
+@* 						<td>@transaction.Tag</td> *@
+@* 						<td>@transaction.Notes</td> *@
+@* 					</tr> *@
+@* 				} *@
+@* 			</tbody> *@
+@* 		</table> *@
+@* 	</div> *@
+
+@* 	<div> *@
+@* 		<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddNewTransactionModal"> *@
+@* 			Add New Transaction *@
+@* 		</button> *@
+@* 	</div> *@
+@* 	<!-- Transactions View End --> *@
+
+
+
+
+@* 	<!-- Add New Transaction Modal Start --> *@
+@* 	<div class="modal" id="AddNewTransactionModal"> *@
+@* 		<div class="modal-dialog"> *@
+@* 			<div class="modal-content"> *@
+@* 				<!-- Model Header --> *@
+@* 				<div class="modal-header"> *@
+@* 					<h3 class="modal-title">Add New Transaction</h3> *@
+@* 					<button type="button" class="btn-close" data-bs-dismiss="modal"></button> *@
+@* 				</div> *@
+
+@* 				<!-- Model Body --> *@
+@* 				<div class="modal-body"> *@
+@* 					<EditForm Model="@transaction" OnValidSubmit="AddNewTransaction"> *@
+@* 						<!-- Transaction Title --> *@
+@* 						<div class="mb-3"> *@
+@* 							<label for="Title" class="form-label">Title</label> *@
+@* 							<InputText id="Title" class="form-control" @bind-Value="transaction.Title" /> *@
+@* 						</div> *@
+
+@* 						<!-- Transaction Type --> *@
+@* 						<div class="mb-3"> *@
+@* 							<label for="Type" class="form-label">Type</label> *@
+@* 							<InputSelect id="Type" class="form-select" @bind-Value="transaction.Type"> *@
+@* 								<option value="Debit" selected>Debit</option> *@
+@* 								<option value="Credit">Credit</option> *@
+@* 							</InputSelect> *@
+@* 						</div> *@
+
+@* 						<!-- Transaction Amount --> *@
+@* 						<div class="mb-3"> *@
+@* 							<label for="Amount" class="form-label">Amount</label> *@
+@* 							<InputNumber class="form-control" id="Amount" placeholder="Enter Amount" @bind-Value="transaction.Amount"/> *@
+@* 						</div> *@
+
+@* 						<!-- Transaction Date --> *@
+@* 						<div class="mb-3"> *@
+@* 							<label for="Date" class="form-label">Date</label> *@
+@* 							<InputDate id="Date" class="form-control" @bind-Value="transaction.Date" /> *@
+@* 						</div> *@
+
+@* 						<!-- Transaction Tag --> *@
+@* 						<div class="mb-3"> *@
+@* 							<label for="Tag" class="form-label">Tag</label> *@
+@* 							<InputSelect id="Tag" class="form-select" @bind-Value="transaction.Tag"> *@
+@* 								<option value="Monthly" selected>Monthly</option> *@
+@* 								<option value="Annual">Annual</option> *@
+@* 								<option value="Electricity">Electricity</option> *@
+@* 								<option value="Water Bill">Water Bill</option> *@
+@* 							</InputSelect> *@
+@* 						</div> *@
+
+@* 						<!-- Transaction Notes --> *@
+@* 						<div class="form-group"> *@
+@* 							<label for="Notes">Notes</label> *@
+@* 							<InputTextArea id="Notes" class="form-control" @bind-Value="transaction.Notes" /> *@
+@* 						</div> *@
+
+@* 						<!-- Add button to trigger AddNewTransaction --> *@
+@* 						<button type="submit" class="btn btn-primary">Add Transaction</button> *@
+@* 					</EditForm> *@
+@* 				</div> *@
+@* 			</div> *@
+@* 		</div> *@
+@* 	</div> *@
+@* 	<!-- Add New Transaction Modal End --> *@
+@* </div> *@
+
+@* @code { *@
+@* 	private Transaction transaction = new Transaction(); *@
+@* 	private List<Transaction> transactions = new List<Transaction>(); *@
+@* 	private bool isSortedByDateAscending = false; *@
+
+@* 	private void SortByDate() *@
+@* 	{ *@
+@* 		isSortedByDateAscending = !isSortedByDateAscending; *@
+
+@* 		if (transactions != null) *@
+@* 		{ *@
+@* 			if (isSortedByDateAscending) *@
+@* 			{ *@
+@* 				transactions = transactions.OrderBy(x => x.Date).ToList(); *@
+@* 			} *@
+@* 			else *@
+@* 			{ *@
+@* 				transactions = transactions.OrderByDescending(x => x.Date).ToList(); *@
+@* 			} *@
+@* 		} *@
+@* 		else *@
+@* 		{ *@
+
+@* 		} *@
+@* 	} *@
+
+
+@* 	// Add new transaction *@
+@* 	private void AddNewTransaction() *@
+@* 	{ *@
+@* 		TransactionService.AddNewTransaction(transaction.Title, *@
+@* 			transaction.Type, *@
+@* 			transaction.Amount, *@
+@* 			transaction.Date, *@
+@* 			transaction.Tag, *@
+@* 			transaction.Notes *@
+@* 		); *@
+
+@* 		LoadTransactions(); *@
+@* 		StateHasChanged(); // Ensures UI is updated *@
+@* 	} *@
+
+
+
+
+@* 	public void LoadTransactions() *@
+@* 	{ *@
+@* 		transactions = TransactionService.GetAllTransactions().OrderByDescending(x => x.Date).ToList(); *@
+@* 	} *@
+
+
+
+@* 	protected override void OnInitialized() *@
+@* 	{ *@
+@* 		LoadTransactions(); *@
+@* 	} *@
+@* } *@
