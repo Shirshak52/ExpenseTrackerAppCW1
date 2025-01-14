@@ -18,17 +18,18 @@ namespace ExpenseTracker.Models
         public string Type { get; set; }
 
         [Required(ErrorMessage = "Please enter an amount.")]
+        [Range(1, 1000000, ErrorMessage = "Amount must be between 1 and 1,000,000.")]
         public float Amount { get; set; }
 
         [Required(ErrorMessage = "Please select a date.")]
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
 
         [Required(ErrorMessage = "Please provide a tag.")]
         public string Tag { get; set; }
 
         public string Notes { get; set; }
 
-        public Transaction(string Title, string Type, float Amount, DateTime Date, string Tag, string Notes)
+        public Transaction(string Title, string Type, float Amount, DateTime? Date, string Tag, string Notes)
         {
             this.Id = Guid.NewGuid();
             this.Title = Title;

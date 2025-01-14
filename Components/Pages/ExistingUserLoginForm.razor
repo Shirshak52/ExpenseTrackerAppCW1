@@ -5,20 +5,20 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<MudForm>
+<MudCard Class="mx-auto mt-4" Style="max-width: 400px;">
+    <MudCardContent>
+        <MudForm>
+            <MudTextField T="string" Label="Password" Variant="Variant.Outlined" Required="true" RequiredError="Password is mandatory." @bind-Value="password" Class="mb-3" />
 
-    <MudTextField T="string" Label="Username" Required="true" RequiredError="Username is mandatory." @bind-Value="username" />
-    <MudTextField T="string" Label="Password" Required="true" RequiredError="Password is mandatory." @bind-Value="password" />
+            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto d-block" OnClick="HandleLogin">Login</MudButton>
+        </MudForm>
 
-    <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Class="ml-auto" OnClick="HandleLogin">Login</MudButton>
-
-</MudForm>
-
-
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <p>@errorMessage</p>
-}
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <MudText Class="text-danger mt-2">@errorMessage</MudText>
+        }
+    </MudCardContent>
+</MudCard>
 
 @code {
     private string username;
@@ -28,7 +28,7 @@
     // Handle login logic
     private void HandleLogin()
     {
-        bool isValid = AuthService.ValidateUser(username, password);
+        bool isValid = AuthService.ValidateUser(password);
 
         // Successful login
         if (isValid)

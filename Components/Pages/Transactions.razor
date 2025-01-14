@@ -3,45 +3,104 @@
 @using ExpenseTracker.Services;
 @inject ITransactionService TransactionService;
 @inject IDialogService DialogService
-
+@using MudBlazor
 @using Microsoft.AspNetCore.Components.Forms;
+@using System.ComponentModel.DataAnnotations
+@using System.Collections.Generic
 
-
-<h1>My Transactions</h1>
+<h1 class="text-center mb-5">My Transactions</h1>
 
 <!-- Transactions View Start -->
+<MudPaper Elevation="2" Class="p-4">
+    <MudDataGrid Items="@transactions" SortMode="SortMode.Multiple" Filterable="true" >
+        <Columns>
+            <PropertyColumn Property="x => x.Title" Sortable="true" />
+            <PropertyColumn Property="x => x.Type" Sortable="true" />
+            <PropertyColumn Property="x => x.Amount" Sortable="true" />
+            <PropertyColumn Property="x => x.Date" Title="Date" Sortable="true" Format="D" />
+            <PropertyColumn Property="x => x.Tag" Sortable="true" />
+            <PropertyColumn Property="x => x.Notes" Sortable="true" />
+        </Columns>
 
-<MudDataGrid Items="@transactions">
-    <Columns>
-        <PropertyColumn Property="x => x.Title" />
-        <PropertyColumn Property="x => x.Type" />
-        <PropertyColumn Property="x => x.Amount" />
-        <PropertyColumn Property="x => x.Date.ToShortDateString()" />
-        <PropertyColumn Property="x => x.Tag" />
-        <PropertyColumn Property="x => x.Notes" />
-    </Columns>
-</MudDataGrid>
+        <PagerContent>
+            <MudDataGridPager T="Transaction" PageSizeOptions="[5, 10, 15, 20]" />
+        </PagerContent>
+    </MudDataGrid>
+</MudPaper>
 
-<MudButton OnClick="OpenAddNewTransactionModal" Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" Class="mt-3">Add New Transaction</MudButton>
+<!-- Add New Transaction Form Start -->
+<MudPaper Elevation="2" Class="p-4 mt-5">
+    <!-- Form Header -->
+    <MudText Typo="Typo.h6" Class="mb-4">Add New Transaction</MudText>
 
+    <EditForm Model="@transaction" OnValidSubmit="AddNewTransaction">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-<AddNewTransactionModal OnTransactionAdded="UpdateTransactionList" />
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudTextField Label="Title" Variant="Variant.Outlined" @bind-Value="transaction.Title" Class="mb-3" Required="true" />
+            </MudItem>
 
+            <MudItem xs="12" sm="6">
+                <MudSelect @bind-Value="@transaction.Type" Label="Type" Variant="Variant.Outlined" Required="true" Class="mb-3">
+                    @foreach (var type in transactionTypes)
+                    {
+                        <MudSelectItem Value="@type">@type</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudNumericField Label="Amount" Variant="Variant.Outlined" @bind-Value="transaction.Amount" Class="mb-3" Required="true" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudDatePicker Label="Date (If not selected, today's date will be used)" Variant="Variant.Outlined" @bind-Value="transaction.Date" Class="mb-3" Required="true" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudSelect @bind-Value="@transaction.Tag" Label="Tag" Variant="Variant.Outlined" Required="true" Class="mb-3">
+                    @foreach (var tag in tags)
+                    {
+                        <MudSelectItem Value="@tag">@tag</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudTextField Label="Notes" Variant="Variant.Outlined" @bind-Value="transaction.Notes" Multiline="true" Rows="3" Class="mb-3" />
+            </MudItem>
+        </MudGrid>
+
+        <div class="text-end">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" Class="mt-3 px-5">
+                Add Transaction
+            </MudButton>
+        </div>
+    </EditForm>
+</MudPaper>
 
 @code {
-    private List<Transaction> transactions;
-    private bool isSortedByDateAscending = false;
+    private Transaction transaction = new();
+    private List<Transaction> transactions = new();
+    private List<string> tags = new List<string>() { "Electricity", "Water Bill", "Petrol" };
+    private List<string> transactionTypes = new List<string>() { "Debit", "Credit" };
 
-
-    private void OpenAddNewTransactionModal()
+    private void AddNewTransaction()
     {
-       DialogService.Show<AddNewTransactionModal>();
-    }
+        TransactionService.AddNewTransaction(transaction.Title,
+            transaction.Type,
+            transaction.Amount,
+            transaction.Date,
+            transaction.Tag,
+            transaction.Notes
+        );
 
-
-    public void UpdateTransactionList()
-    {
+        // Reload transactions list
         LoadTransactions();
+
+        // Ensure UI is updated
         StateHasChanged();
     }
 

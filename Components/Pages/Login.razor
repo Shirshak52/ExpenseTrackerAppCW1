@@ -7,18 +7,20 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
+<MudCard Class="mx-auto mt-5" Style="max-width: 400px;">
+    <MudCardContent>
+        <h1 class="text-center mb-4">Login</h1>
 
-<h1>Login</h1>
-
-@if (isNewUser)
-{
-    <NewUserLoginForm/>
-}
-else
-{
-    <ExistingUserLoginForm/>
-}
-
+        @if (isNewUser)
+        {
+            <NewUserLoginForm />
+        }
+        else
+        {
+            <ExistingUserLoginForm />
+        }
+    </MudCardContent>
+</MudCard>
 
 @code {
     private bool isNewUser;

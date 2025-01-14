@@ -9,7 +9,7 @@ namespace ExpenseTracker.Services
 {
     interface IAuthService
     {
-        public bool ValidateUser(string Username, string Password);
+        public bool ValidateUser(string Password);
 
         public void SaveUser(string Username, string Password, string PreferredCurrency);
 

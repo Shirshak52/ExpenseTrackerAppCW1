@@ -21,7 +21,7 @@ namespace ExpenseTracker.Services
         }
 
         // Add a new transaction to the list, then flush it to the json file
-        public void AddNewTransaction(string Title, string Type, float Amount, DateTime Date, string Tag, string Notes)
+        public void AddNewTransaction(string Title, string Type, float Amount, DateTime? Date, string Tag, string Notes)
         {
             Transaction newTransaction = new Transaction(Title, Type, Amount, Date, Tag, Notes);
             _transactions.Add(newTransaction);

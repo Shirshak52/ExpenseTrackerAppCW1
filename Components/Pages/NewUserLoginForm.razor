@@ -5,30 +5,32 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<EditForm Model="@user" OnValidSubmit="HandleLogin">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<MudCard Class="mx-auto mt-4 p-4" Style="max-width: 400px;">
+    <MudCardContent>
+        <EditForm Model="@user" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary Class="mb-3" />
 
-    <MudTextField @bind-Value="@user.Username" Label="Username" Variant="Variant.Text"></MudTextField>
-    <MudTextField @bind-Value="@user.Password" Label="Password" Variant="Variant.Text"></MudTextField>
+            <MudTextField @bind-Value="@user.Username" Label="Username" Variant="Variant.Outlined" Class="mb-3" />
+            <MudTextField @bind-Value="@user.Password" Label="Password" Variant="Variant.Outlined" InputType="InputType.Password" Class="mb-3" />
 
-    <MudSelect @bind-Value="@user.PreferredCurrency" Label="Preferred Currency" Variant="Variant.Outlined">
-        @foreach (var currency in currencies)
-        {
-            <MudSelectItem Value="@currency">@currency</MudSelectItem>
-        }
-    </MudSelect>
+            <MudSelect @bind-Value="@user.PreferredCurrency" Label="Preferred Currency" Variant="Variant.Outlined" Class="mb-3">
+                @foreach (var currency in currencies)
+                {
+                    <MudSelectItem Value="@currency">@currency</MudSelectItem>
+                }
+            </MudSelect>
 
-    <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Class="ml-auto">Login</MudButton>
-</EditForm>
-
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" FullWidth="true">Login</MudButton>
+        </EditForm>
+    </MudCardContent>
+</MudCard>
 
 @code {
     private User user = new User();
     private string errorMessage = string.Empty;
-    private List<string> currencies = new List<string>() {"NPR", "USD"};
+    private List<string> currencies = new List<string>() { "NPR", "USD" };
 
-    // Handle login logic
     private void HandleLogin()
     {
         // Save the user credentials
@@ -38,5 +40,3 @@
         NavigationManager.NavigateTo("/dashboard");
     }
 }
-
-

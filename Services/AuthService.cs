@@ -21,9 +21,9 @@ namespace ExpenseTracker.Services
         }
 
         // Validate user on login
-        public bool ValidateUser(string Username, string Password)
+        public bool ValidateUser(string Password)
         {
-            if (_currentUser != null && _currentUser.Username == Username && _currentUser.Password == Password)
+            if (_currentUser != null && _currentUser.Password == Password)
             {
                 return true;
             }

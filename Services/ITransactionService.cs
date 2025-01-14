@@ -12,7 +12,7 @@ namespace ExpenseTracker.Services
         public void Initialize();
 
         // Create
-        public void AddNewTransaction(string Title, string Type, float Amount, DateTime Date, string Tag, string Notes);
+        public void AddNewTransaction(string Title, string Type, float Amount, DateTime? Date, string Tag, string Notes);
 
         // Read
         public IEnumerable<Transaction> GetAllTransactions();
