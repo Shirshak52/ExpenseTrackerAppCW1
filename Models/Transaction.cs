@@ -13,6 +13,8 @@ namespace ExpenseTracker.Models
 
         [Required(ErrorMessage = "Please enter a title.")]
         public string Title { get; set; }
+
+        [Required(ErrorMessage = "Please select a type.")]
         public string Type { get; set; }
 
         [Required(ErrorMessage = "Please enter an amount.")]
@@ -40,11 +42,11 @@ namespace ExpenseTracker.Models
         public Transaction()
         {
             this.Id = Guid.NewGuid();
-            this.Title = string.Empty;
-            this.Type = string.Empty;
+            this.Title = null;
+            this.Type = null;
             this.Amount = 0.0f;
             this.Date = DateTime.Now;
-            this.Tag = string.Empty;
+            this.Tag = null;
             this.Notes = string.Empty;
         }
     }

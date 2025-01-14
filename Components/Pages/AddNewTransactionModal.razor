@@ -1,0 +1,77 @@
+﻿@using ExpenseTracker.Models
+@using ExpenseTracker.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using MudBlazor
+@inject ITransactionService TransactionService
+@inject IDialogService DialogService
+
+
+<MudDialog FullWidth="true" MaxWidth="MaxWidth.Medium">
+    <DialogContent>
+        <!-- Modal Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mud-typography mud-typography-h6">Add New Transaction</h3>
+        </div>
+
+        <!-- Modal Body -->
+        <EditForm Model="@transaction" OnValidSubmit="AddNewTransaction">
+            <!-- Transaction Title -->
+            <MudTextField Label="Title" Variant="Variant.Outlined" @bind-Value="transaction.Title" Class="mb-3" Required="true" />
+
+            <!-- Transaction Type -->
+            <MudSelect @bind-Value="@transaction.Type" Label="Type" Variant="Variant.Outlined">
+                @foreach (var type in transactionTypes)
+                {
+                    <MudSelectItem Value="@type">@type</MudSelectItem>
+                }
+            </MudSelect>
+
+            <!-- Transaction Amount -->
+            <MudNumericField Label="Amount" Variant="Variant.Outlined" @bind-Value="transaction.Amount" Class="mb-3" Required="true" />
+
+            <!-- Transaction Date -->
+            <MudDatePicker Label="Date" Variant="Variant.Outlined" @bind-Value="transaction.Date" Class="mb-3" Required="true" />
+
+            <!-- Transaction Tag -->
+            <MudSelect @bind-Value="@transaction.Tag" Label="Tag" Variant="Variant.Outlined">
+                @foreach (var tag in tags)
+                {
+                    <MudSelectItem Value="@tag">@tag</MudSelectItem>
+                }
+            </MudSelect>
+
+            <!-- Transaction Notes -->
+            <MudTextField Label="Notes" Variant="Variant.Outlined" @bind-Value="transaction.Notes" Multiline="true" Rows="3" Class="mb-3" />
+
+            <!-- Add Button -->
+            <div class="text-end">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" Class="mt-3">Add Transaction</MudButton>
+            </div>
+        </EditForm>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    private Transaction transaction = new();
+    private List<string> tags = new List<string>() { "Electricity", "Water Bill", "Petrol" };
+    private List<string> transactionTypes = new List<string>() { "Debit", "Credit" };
+
+    private Transactions transactions = new();
+    [Parameter] public EventCallback OnTransactionAdded { get; set; }
+
+
+    private void AddNewTransaction()
+    {
+        TransactionService.AddNewTransaction(transaction.Title,
+            transaction.Type,
+            transaction.Amount,
+            transaction.Date,
+            transaction.Tag,
+            transaction.Notes
+        );
+
+        // OnTransactionAdded?.Invoke();
+        OnTransactionAdded.InvokeAsync();
+        transaction = new Transaction();
+    }
+}

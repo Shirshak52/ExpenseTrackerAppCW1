@@ -14,7 +14,6 @@ namespace ExpenseTracker.Services
     {
         private readonly string _filePath = Path.Combine(FileSystem.Current.AppDataDirectory, "userCreds.json");
         private User _currentUser;
-        private bool isLoggedIn { get; set; } = false;
 
         public AuthService()
         {

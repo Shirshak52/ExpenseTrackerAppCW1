@@ -13,8 +13,12 @@ namespace ExpenseTracker.Services
     public class TransactionService : ITransactionService
     {
         private readonly string _filePath = Path.Combine(FileSystem.Current.AppDataDirectory, "transactions.json");
+        private List<Transaction> _transactions;
 
-        private List<Transaction> _transactions = new List<Transaction>();
+        public TransactionService()
+        {
+            Initialize();
+        }
 
         // Add a new transaction to the list, then flush it to the json file
         public void AddNewTransaction(string Title, string Type, float Amount, DateTime Date, string Tag, string Notes)
@@ -27,7 +31,7 @@ namespace ExpenseTracker.Services
         // Get all transactions from the list, ordered by Date
         public IEnumerable<Transaction> GetAllTransactions()
         {
-            return _transactions.OrderByDescending(x => x.Date);
+            return _transactions;
         }
 
 
@@ -38,13 +42,13 @@ namespace ExpenseTracker.Services
             if (File.Exists(_filePath))
             {
                 var jsonTransactions = File.ReadAllText(_filePath);
-                _transactions = JsonSerializer.Deserialize<List<Transaction>>(jsonTransactions) ?? [];
+                _transactions = JsonSerializer.Deserialize<List<Transaction>>(jsonTransactions) ?? null;
             }
 
             // If the json file does not exist
             else
             {
-                _transactions = new List<Transaction>();
+                _transactions = new();
             }
         }
 
