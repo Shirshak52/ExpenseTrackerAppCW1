@@ -14,7 +14,7 @@
 <MudPaper Elevation="2" Class="p-4">
 
     <MudDataGrid Items="@(isAnyFilterApplied ? filteredTransactions : transactions)" SortMode="SortMode.Multiple" Filterable="true">
-        
+
         <ToolBarContent>
 
             <!-- Tag Filter -->
@@ -41,7 +41,7 @@
             </MudButton>
 
         </ToolBarContent>
-        
+
         <Columns>
             <PropertyColumn Property="x => x.Title" Sortable="true" />
             <PropertyColumn Property="x => x.Type" Sortable="true" />
@@ -122,8 +122,8 @@
 
     private List<Transaction> transactions = new();
 
-    private List<string> tags = new List<string>() { "Electricity", "Water Bill", "Petrol" };
-    private List<string> transactionTypes = new List<string>() { "Debit", "Credit" };
+    private List<string> tags = new();
+    private List<string> transactionTypes => TransactionService.GetAllTypes();
 
     private string _selectedType;
     private string _selectedTag;
@@ -159,6 +159,9 @@
         // Reload transactions list
         LoadTransactions();
 
+        // Reload tags list
+        LoadTags();
+
         // Ensure UI is updated
         StateHasChanged();
     }
@@ -168,8 +171,14 @@
         transactions = TransactionService.GetAllTransactions().ToList();
     }
 
+    private void LoadTags()
+    {
+        tags = TransactionService.GetAllTags().ToList();
+    }
+
     protected override void OnInitialized()
     {
         LoadTransactions();
+        LoadTags();
     }
 }

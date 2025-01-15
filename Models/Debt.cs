@@ -33,12 +33,10 @@ namespace ExpenseTracker.Models
         public int DateDifference => (DueDate.HasValue && Date.HasValue) ? (DueDate.Value - Date.Value).Days : 0;
         public bool IsPending { get; set; }
 
-        [Required(ErrorMessage = "Please provide a tag.")]
-        public string Tag { get; set; }
+        public string Status => IsPending ? "Pending" : "Cleared";
 
-        public string Notes { get; set; }
 
-        public Debt(string Title, float Amount, DateTime? Date, string Source, DateTime? DueDate, bool IsPending, string Tag, string Notes)
+        public Debt(string Title, float Amount, DateTime? Date, string Source, DateTime? DueDate)
         {
             this.Id = Guid.NewGuid();
             this.Title = Title;
@@ -46,9 +44,7 @@ namespace ExpenseTracker.Models
             this.Date = Date;
             this.Source = Source;
             this.DueDate = DueDate;
-            this.IsPending = IsPending;
-            this.Tag = Tag;
-            this.Notes = Notes;
+            this.IsPending = true;
         }
 
         public Debt()
@@ -60,8 +56,6 @@ namespace ExpenseTracker.Models
             this.Source = null;
             this.DueDate = DateTime.Now;
             this.IsPending = true;
-            this.Tag = null;
-            this.Notes = string.Empty;
         }
     }
 }

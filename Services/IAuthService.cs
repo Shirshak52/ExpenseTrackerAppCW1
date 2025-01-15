@@ -15,7 +15,8 @@ namespace ExpenseTracker.Services
 
         public User GetUserFromFile();
 
-
         public bool UserExists();
+
+        public List<string> GetAvailableCurrencies();
     }
 }

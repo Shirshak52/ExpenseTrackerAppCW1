@@ -21,9 +21,9 @@ namespace ExpenseTracker.Services
         }
 
         // Add a new transaction to the list, then flush it to the json file
-        public void AddNewDebt(string Title, float Amount, DateTime? Date, string Source, DateTime? DueDate, bool IsPending, string Tag, string Notes)
+        public void AddNewDebt(string Title, float Amount, DateTime? Date, string Source, DateTime? DueDate)
         {
-            Debt newDebt = new Debt(Title, Amount, Date, Source, DueDate, IsPending, Tag, Notes);
+            Debt newDebt = new Debt(Title, Amount, Date, Source, DueDate);
             _debts.Add(newDebt);
             Flush();
         }

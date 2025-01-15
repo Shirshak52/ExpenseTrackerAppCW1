@@ -12,7 +12,7 @@ namespace ExpenseTracker.Services
         public void Initialize();
 
         // Create
-        public void AddNewDebt(string Title, float Amount, DateTime? Date, string Source, DateTime? DueDate, bool IsPending, string Tag, string Notes);
+        public void AddNewDebt(string Title, float Amount, DateTime? Date, string Source, DateTime? DueDate);
 
         // Read
         public IEnumerable<Debt> GetAllDebts();

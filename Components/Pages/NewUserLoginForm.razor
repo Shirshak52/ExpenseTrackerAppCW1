@@ -29,7 +29,7 @@
 @code {
     private User user = new User();
     private string errorMessage = string.Empty;
-    private List<string> currencies = new List<string>() { "NPR", "USD" };
+    private List<string> currencies => AuthService.GetAvailableCurrencies();
 
     private bool isShow;
     private InputType PasswordInput = InputType.Password;

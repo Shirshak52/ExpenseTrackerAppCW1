@@ -10,8 +10,8 @@
 
 <h1 class="text-center mb-5">My Debts</h1>
 
-<MudPaper Elevation="2" Class="p-2">
-    <MudContainer MaxWidth="MaxWidth.Medium">
+<MudPaper Elevation="2" Class="p-4 mb-4">
+    <MudContainer>
         <MudDataGrid Items="@debts" SortMode="SortMode.Multiple" Filterable="true">
             <ToolBarContent>
                 @* Toolbar content (optional filters) *@
@@ -23,9 +23,7 @@
                 <PropertyColumn Property="x => x.Date" Sortable="true" Format="D" />
                 <PropertyColumn Property="x => x.Source" Sortable="true" />
                 <PropertyColumn Property="x => x.DueDate" Title="Due Date" Sortable="true" Format="D" />
-                <PropertyColumn Property="x => x.IsPending" Sortable="true" />
-                <PropertyColumn Property="x => x.Tag" Sortable="true" />
-                <PropertyColumn Property="x => x.Notes" Sortable="true" />
+                <PropertyColumn Property="x => x.Status" Sortable="true" />
             </Columns>
 
             <PagerContent>
@@ -35,9 +33,9 @@
     </MudContainer>
 </MudPaper>
 
-<MudPaper Elevation="2" Class="p-2 mt-3">
-    <MudContainer MaxWidth="MaxWidth.Medium">
-        <MudText Typo="Typo.h6" Class="mb-2">Add New Debt</MudText>
+<MudPaper Elevation="2" Class="p-4 mt-3">
+    <MudContainer>
+        <MudText Typo="Typo.h6" Class="mb-3">Add New Debt</MudText>
 
         <EditForm Model="@debt" OnValidSubmit="AddNewDebt">
             <DataAnnotationsValidator />
@@ -66,25 +64,10 @@
                     <MudDatePicker Label="Due Date" Dense="true" Variant="Variant.Outlined" @bind-Date="debt.DueDate" Required="true" />
                     <ValidationMessage For="@(() => debt.DateDifference)" />
                 </MudItem>
-
-                <MudItem xs="12" sm="6" md="4">
-                    <MudSelect @bind-Value="debt.Tag" Dense="true" Label="Tag" Variant="Variant.Outlined" Required="true">
-                        @foreach (var tag in tags)
-                        {
-                            <MudSelectItem Value="@tag">@tag</MudSelectItem>
-                        }
-                    </MudSelect>
-                    <ValidationMessage For="@(() => debt.Tag)" />
-                </MudItem>
-
-                <MudItem xs="12">
-                    <MudTextField Label="Notes" Dense="true" Variant="Variant.Outlined" @bind-Value="debt.Notes" Multiline="true" Rows="3" />
-                    <ValidationMessage For="@(() => debt.Notes)" />
-                </MudItem>
             </MudGrid>
 
-            <div class="text-end mt-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" Class="mt-3 px-5">
+            <div class="text-end mt-3">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" Class="px-5">
                     Add Debt
                 </MudButton>
             </div>
@@ -101,8 +84,6 @@
     private Debt debt = new();
 
     private List<Debt> debts = new();
-
-    private List<string> tags = new List<string>() { "Electricity", "Water Bill", "Petrol" };
 
     // private string _selectedType;
     // private string _selectedTag;
@@ -131,10 +112,7 @@
             debt.Amount,
             debt.Date,
             debt.Source,
-            debt.DueDate,
-            debt.IsPending,
-            debt.Tag,
-            debt.Notes
+            debt.DueDate
         );
 
         // Reload transactions list

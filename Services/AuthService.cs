@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using ExpenseTracker.Models;
+using System.Security.Cryptography;
 
 namespace ExpenseTracker.Services
 {
@@ -23,7 +24,7 @@ namespace ExpenseTracker.Services
         // Validate user on login
         public bool ValidateUser(string Password)
         {
-            if (_currentUser != null && _currentUser.Password == Password)
+            if (_currentUser != null && _currentUser.Password == HashPassword(Password))
             {
                 return true;
             }
@@ -34,13 +35,24 @@ namespace ExpenseTracker.Services
         // Save user credentials on first login
         public void SaveUser(string Username, string Password, string PreferredCurrency)
         {
-            _currentUser = new User(Username, Password, PreferredCurrency);
+            _currentUser = new User(Username, HashPassword(Password), PreferredCurrency);
             Flush();
+        }
+
+        public static string HashPassword(string password)
+        {
+            return Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(password)));
+
         }
 
         public User GetUserFromFile()
         {
             return _currentUser;
+        }
+
+        public List<string> GetAvailableCurrencies()
+        {
+            return User.AvailableCurrencies;
         }
 
 

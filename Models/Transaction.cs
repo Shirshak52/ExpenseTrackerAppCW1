@@ -30,6 +30,19 @@ namespace ExpenseTracker.Models
 
         public string Notes { get; set; }
 
+        public static List<string> Types = new List<string>
+        {
+            "Credit",
+            "Debit"
+        };
+
+        public static List<string> Tags = new List<string>
+        {
+            "Electricity",
+            "Water Bill",
+            "Petrol"
+        };
+
         public Transaction(string Title, string Type, float Amount, DateTime? Date, string Tag, string Notes)
         {
             this.Id = Guid.NewGuid();
