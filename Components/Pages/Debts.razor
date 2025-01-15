@@ -1,7 +1,156 @@
 ﻿@page "/debts"
+@using ExpenseTracker.Models;
+@using ExpenseTracker.Services;
+@inject IDebtService DebtService;
+@inject IDialogService DialogService
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Forms;
+@using System.ComponentModel.DataAnnotations
+@using System.Collections.Generic
 
-<h3>Debts</h3>
+<h1 class="text-center mb-5">My Debts</h1>
+
+<MudPaper Elevation="2" Class="p-2">
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudDataGrid Items="@debts" SortMode="SortMode.Multiple" Filterable="true">
+            <ToolBarContent>
+                @* Toolbar content (optional filters) *@
+            </ToolBarContent>
+
+            <Columns>
+                <PropertyColumn Property="x => x.Title" Sortable="true" />
+                <PropertyColumn Property="x => x.Amount" Sortable="true" />
+                <PropertyColumn Property="x => x.Date" Sortable="true" Format="D" />
+                <PropertyColumn Property="x => x.Source" Sortable="true" />
+                <PropertyColumn Property="x => x.DueDate" Title="Due Date" Sortable="true" Format="D" />
+                <PropertyColumn Property="x => x.IsPending" Sortable="true" />
+                <PropertyColumn Property="x => x.Tag" Sortable="true" />
+                <PropertyColumn Property="x => x.Notes" Sortable="true" />
+            </Columns>
+
+            <PagerContent>
+                <MudDataGridPager T="Debt" PageSizeOptions="[5, 10, 15, 20]" />
+            </PagerContent>
+        </MudDataGrid>
+    </MudContainer>
+</MudPaper>
+
+<MudPaper Elevation="2" Class="p-2 mt-3">
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        <MudText Typo="Typo.h6" Class="mb-2">Add New Debt</MudText>
+
+        <EditForm Model="@debt" OnValidSubmit="AddNewDebt">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField Label="Title" Dense="true" Variant="Variant.Outlined" @bind-Value="debt.Title" Required="true" />
+                    <ValidationMessage For="@(() => debt.Title)" />
+                </MudItem>
+
+                <MudItem xs="12" sm="6" md="4">
+                    <MudNumericField Label="Amount" Dense="true" Variant="Variant.Outlined" @bind-Value="debt.Amount" Required="true" />
+                    <ValidationMessage For="@(() => debt.Amount)" />
+                </MudItem>
+
+                <MudItem xs="12" sm="6" md="4">
+                    <MudDatePicker Label="Date" Dense="true" Variant="Variant.Outlined" @bind-Date="debt.Date" Required="true" />
+                    <ValidationMessage For="@(() => debt.Date)" />
+                </MudItem>
+
+                <MudItem xs="12" sm="6" md="4">
+                    <MudTextField Label="Source" Dense="true" Variant="Variant.Outlined" @bind-Value="debt.Source" Required="true" />
+                    <ValidationMessage For="@(() => debt.Source)" />
+                </MudItem>
+
+                <MudItem xs="12" sm="6" md="4">
+                    <MudDatePicker Label="Due Date" Dense="true" Variant="Variant.Outlined" @bind-Date="debt.DueDate" Required="true" />
+                    <ValidationMessage For="@(() => debt.DateDifference)" />
+                </MudItem>
+
+                <MudItem xs="12" sm="6" md="4">
+                    <MudSelect @bind-Value="debt.Tag" Dense="true" Label="Tag" Variant="Variant.Outlined" Required="true">
+                        @foreach (var tag in tags)
+                        {
+                            <MudSelectItem Value="@tag">@tag</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <ValidationMessage For="@(() => debt.Tag)" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTextField Label="Notes" Dense="true" Variant="Variant.Outlined" @bind-Value="debt.Notes" Multiline="true" Rows="3" />
+                    <ValidationMessage For="@(() => debt.Notes)" />
+                </MudItem>
+            </MudGrid>
+
+            <div class="text-end mt-2">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" Class="mt-3 px-5">
+                    Add Debt
+                </MudButton>
+            </div>
+        </EditForm>
+    </MudContainer>
+</MudPaper>
+
+
+
+
+
 
 @code {
+    private Debt debt = new();
 
+    private List<Debt> debts = new();
+
+    private List<string> tags = new List<string>() { "Electricity", "Water Bill", "Petrol" };
+
+    // private string _selectedType;
+    // private string _selectedTag;
+    // private bool isAnyFilterApplied => !string.IsNullOrEmpty(_selectedTag) || !string.IsNullOrEmpty(_selectedType);
+
+    // private List<Debt> filteredDebts
+    // {
+    //     get
+    //     {
+    //         return debts
+    //             .Where(t => (string.IsNullOrEmpty(_selectedTag) || t.Tag == _selectedTag) &&
+    //                         (string.IsNullOrEmpty(_selectedType) || t.Type == _selectedType))
+    //             .ToList();
+    //     }
+    // }
+
+    // private void ResetFilters()
+    // {
+    //     _selectedTag = string.Empty;
+    //     _selectedType = string.Empty;
+    // }
+
+    private void AddNewDebt()
+    {
+        DebtService.AddNewDebt(debt.Title,
+            debt.Amount,
+            debt.Date,
+            debt.Source,
+            debt.DueDate,
+            debt.IsPending,
+            debt.Tag,
+            debt.Notes
+        );
+
+        // Reload transactions list
+        LoadDebts();
+
+        // Ensure UI is updated
+        StateHasChanged();
+    }
+
+    private void LoadDebts()
+    {
+        debts = DebtService.GetAllDebts().ToList();
+    }
+
+    protected override void OnInitialized()
+    {
+        LoadDebts();
+    }
 }

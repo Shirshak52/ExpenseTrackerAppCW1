@@ -20,6 +20,7 @@ namespace ExpenseTracker
             builder.Services.AddMudServices();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITransactionService, TransactionService>();
+            builder.Services.AddScoped<IDebtService, DebtService>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

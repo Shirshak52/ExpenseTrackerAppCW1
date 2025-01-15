@@ -8,7 +8,8 @@
 <MudCard Class="mx-auto mt-4" Style="max-width: 400px;">
     <MudCardContent>
         <MudForm>
-            <MudTextField T="string" Label="Password" Variant="Variant.Outlined" Required="true" RequiredError="Password is mandatory." @bind-Value="password" Class="mb-3" />
+
+            <MudTextField @bind-Value="password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" AdornmentAriaLabel="Show Password" Required="true" />
 
             <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto d-block" OnClick="HandleLogin">Login</MudButton>
         </MudForm>
@@ -21,9 +22,28 @@
 </MudCard>
 
 @code {
-    private string username;
     private string password;
     private string errorMessage = string.Empty;
+
+    private bool isShow;
+    private InputType PasswordInput = InputType.Password;
+    private string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private void TogglePasswordVisibility()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
 
     // Handle login logic
     private void HandleLogin()
@@ -39,7 +59,7 @@
         else
         {
             // Invalid login (user credentials don't match)
-            errorMessage = "Invalid username or password.";
+            errorMessage = "Invalid password.";
         }
     }
 }
