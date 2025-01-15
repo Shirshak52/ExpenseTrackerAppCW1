@@ -22,6 +22,7 @@ namespace ExpenseTracker.Models
         public float Amount { get; set; }
 
         [Required(ErrorMessage = "Please select a date.")]
+        [Range(typeof(DateTime), "1/1/1900", "12/31/2100", ErrorMessage = "Date must be between January 1, 1900 and December 31, 2100.")]
         public DateTime? Date { get; set; }
 
         [Required(ErrorMessage = "Please provide a tag.")]

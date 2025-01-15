@@ -12,7 +12,36 @@
 
 <!-- Transactions View Start -->
 <MudPaper Elevation="2" Class="p-4">
-    <MudDataGrid Items="@transactions" SortMode="SortMode.Multiple" Filterable="true" >
+
+    <MudDataGrid Items="@(isAnyFilterApplied ? filteredTransactions : transactions)" SortMode="SortMode.Multiple" Filterable="true">
+        
+        <ToolBarContent>
+
+            <!-- Tag Filter -->
+            <MudSelect @bind-Value="_selectedTag" Label="Filter by Tag" Variant="Variant.Outlined" Class="mb-3" T="string">
+                <MudSelectItem Value="@(string.Empty)">All</MudSelectItem>
+                @foreach (var tag in tags)
+                {
+                    <MudSelectItem Value="@tag">@tag</MudSelectItem>
+                }
+            </MudSelect>
+
+            <!-- Type Filter -->
+            <MudSelect @bind-Value="_selectedType" Label="Filter by Type" Variant="Variant.Outlined" Class="mb-3" T="string">
+                <MudSelectItem Value="@(string.Empty)">All</MudSelectItem>
+                @foreach (var type in transactionTypes)
+                {
+                    <MudSelectItem Value="@type">@type</MudSelectItem>
+                }
+            </MudSelect>
+
+            <!-- Reset Filters -->
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mb-3" OnClick="ResetFilters">
+                Reset Filters
+            </MudButton>
+
+        </ToolBarContent>
+        
         <Columns>
             <PropertyColumn Property="x => x.Title" Sortable="true" />
             <PropertyColumn Property="x => x.Type" Sortable="true" />
@@ -35,11 +64,12 @@
 
     <EditForm Model="@transaction" OnValidSubmit="AddNewTransaction">
         <DataAnnotationsValidator />
-        <ValidationSummary />
+        @* <ValidationSummary /> *@
 
         <MudGrid>
             <MudItem xs="12" sm="6">
                 <MudTextField Label="Title" Variant="Variant.Outlined" @bind-Value="transaction.Title" Class="mb-3" Required="true" />
+                <ValidationMessage For="@(() => transaction.Title)" />
             </MudItem>
 
             <MudItem xs="12" sm="6">
@@ -49,14 +79,17 @@
                         <MudSelectItem Value="@type">@type</MudSelectItem>
                     }
                 </MudSelect>
+                <ValidationMessage For="@(() => transaction.Type)" />
             </MudItem>
 
             <MudItem xs="12" sm="6">
                 <MudNumericField Label="Amount" Variant="Variant.Outlined" @bind-Value="transaction.Amount" Class="mb-3" Required="true" />
+                <ValidationMessage For="@(() => transaction.Amount)" />
             </MudItem>
 
             <MudItem xs="12" sm="6">
-                <MudDatePicker Label="Date (If not selected, today's date will be used)" Variant="Variant.Outlined" @bind-Value="transaction.Date" Class="mb-3" Required="true" />
+                <MudDatePicker Label="Date (If not selected, today's date will be used)" Variant="Variant.Outlined" @bind-Date="transaction.Date" Class="mb-3" Required="true" />
+                <ValidationMessage For="@(() => transaction.Date)" />
             </MudItem>
 
             <MudItem xs="12" sm="6">
@@ -66,10 +99,12 @@
                         <MudSelectItem Value="@tag">@tag</MudSelectItem>
                     }
                 </MudSelect>
+                <ValidationMessage For="@(() => transaction.Tag)" />
             </MudItem>
 
             <MudItem xs="12">
                 <MudTextField Label="Notes" Variant="Variant.Outlined" @bind-Value="transaction.Notes" Multiline="true" Rows="3" Class="mb-3" />
+                <ValidationMessage For="@(() => transaction.Notes)" />
             </MudItem>
         </MudGrid>
 
@@ -81,11 +116,35 @@
     </EditForm>
 </MudPaper>
 
+
 @code {
     private Transaction transaction = new();
+
     private List<Transaction> transactions = new();
+
     private List<string> tags = new List<string>() { "Electricity", "Water Bill", "Petrol" };
     private List<string> transactionTypes = new List<string>() { "Debit", "Credit" };
+
+    private string _selectedType;
+    private string _selectedTag;
+    private bool isAnyFilterApplied => !string.IsNullOrEmpty(_selectedTag) || !string.IsNullOrEmpty(_selectedType);
+
+    private List<Transaction> filteredTransactions
+    {
+        get
+        {
+            return transactions
+                .Where(t => (string.IsNullOrEmpty(_selectedTag) || t.Tag == _selectedTag) &&
+                            (string.IsNullOrEmpty(_selectedType) || t.Type == _selectedType))
+                .ToList();
+        }
+    }
+
+    private void ResetFilters()
+    {
+        _selectedTag = string.Empty;
+        _selectedType = string.Empty;
+    }
 
     private void AddNewTransaction()
     {
