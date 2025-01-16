@@ -21,12 +21,11 @@ namespace ExpenseTracker.Models
         [Required(ErrorMessage = "A currency must be selected.")]
         public string PreferredCurrency { get; set; }
 
-
         public static List<string> AvailableCurrencies = new List<string>
         {
-            "NPR (Nepalese Rupee)",
-            "USD (United States Dollar)",
-            "INR (Indian Rupee)"
+            "NRs.",
+            "US$",
+            "INR"
         };
 
 

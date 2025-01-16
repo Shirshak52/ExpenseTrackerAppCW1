@@ -13,9 +13,6 @@
 <MudPaper Elevation="2" Class="p-4 mb-4">
     <MudContainer>
         <MudDataGrid Items="@debts" SortMode="SortMode.Multiple" Filterable="true">
-            <ToolBarContent>
-                @* Toolbar content (optional filters) *@
-            </ToolBarContent>
 
             <Columns>
                 <PropertyColumn Property="x => x.Title" Sortable="true" />
@@ -24,6 +21,11 @@
                 <PropertyColumn Property="x => x.Source" Sortable="true" />
                 <PropertyColumn Property="x => x.DueDate" Title="Due Date" Sortable="true" Format="D" />
                 <PropertyColumn Property="x => x.Status" Sortable="true" />
+                <TemplateColumn CellClass="d-flex justify-end">
+                    <CellTemplate>
+                        <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">Clear Debt</MudButton>
+                    </CellTemplate>
+                </TemplateColumn>
             </Columns>
 
             <PagerContent>
@@ -84,27 +86,6 @@
     private Debt debt = new();
 
     private List<Debt> debts = new();
-
-    // private string _selectedType;
-    // private string _selectedTag;
-    // private bool isAnyFilterApplied => !string.IsNullOrEmpty(_selectedTag) || !string.IsNullOrEmpty(_selectedType);
-
-    // private List<Debt> filteredDebts
-    // {
-    //     get
-    //     {
-    //         return debts
-    //             .Where(t => (string.IsNullOrEmpty(_selectedTag) || t.Tag == _selectedTag) &&
-    //                         (string.IsNullOrEmpty(_selectedType) || t.Type == _selectedType))
-    //             .ToList();
-    //     }
-    // }
-
-    // private void ResetFilters()
-    // {
-    //     _selectedTag = string.Empty;
-    //     _selectedType = string.Empty;
-    // }
 
     private void AddNewDebt()
     {

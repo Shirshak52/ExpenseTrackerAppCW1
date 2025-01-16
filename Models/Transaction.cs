@@ -38,9 +38,16 @@ namespace ExpenseTracker.Models
 
         public static List<string> Tags = new List<string>
         {
-            "Electricity",
-            "Water Bill",
-            "Petrol"
+            "Yearly",
+            "Monthly",
+            "Food",
+            "Drinks",
+            "Clothes",
+            "Gadgets",
+            "Miscellaneous",
+            "Fuel",
+            "EMI",
+            "Party"
         };
 
         public Transaction(string Title, string Type, float Amount, DateTime? Date, string Tag, string Notes)

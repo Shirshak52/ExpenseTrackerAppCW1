@@ -1,7 +1,125 @@
 ﻿@page "/dashboard"
+@using ExpenseTracker.Models;
+@using ExpenseTracker.Services;
+@inject IAuthService AuthService;
+@inject ITransactionService TransactionService;
+@inject IDebtService DebtService;
+@inject IDialogService DialogService
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Forms;
+@using System.ComponentModel.DataAnnotations
+@using System.Collections.Generic
 
 <h3>Dashboard</h3>
 
-@code {
+<!-- Balance -->
+<!-- Total Outflows -->
+<!-- Total Inflows -->
 
+<!-- Top transactions -->
+
+<!-- Top debts -->
+<!-- Total Pending Debts -->
+
+<MudContainer>
+    <!-- Cards for Balance, Total Inflows, Total Outflows, Total Pending Debt -->
+    <MudStack Direction="Row" Spacing="3">
+        <!-- Balance Card -->
+        <MudCard Class="d-flex justify-space-between" Elevation="3">
+            <MudCardContent>
+                <MudText Typo="Typo.h6">Balance</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Primary">@currentUser.PreferredCurrency @balance</MudText>
+            </MudCardContent>
+        </MudCard>
+
+        <!-- Total Inflows Card -->
+        <MudCard Class="d-flex justify-space-between" Elevation="3">
+            <MudCardContent>
+                <MudText Typo="Typo.h6">Total Inflows</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Info">@currentUser.PreferredCurrency @totalInflows</MudText>
+            </MudCardContent>
+        </MudCard>
+
+        <!-- Total Outflows Card -->
+        <MudCard Class="d-flex justify-space-between" Elevation="3">
+            <MudCardContent>
+                <MudText Typo="Typo.h6">Total Outflows</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Error">@currentUser.PreferredCurrency @totalOutflows</MudText>
+            </MudCardContent>
+        </MudCard>
+
+        <!-- Total Pending Debt Card -->
+        <MudCard Class="d-flex justify-space-between" Elevation="3">
+            <MudCardContent>
+                <MudText Typo="Typo.h6">Total Pending Debt</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Warning">@currentUser.PreferredCurrency @totalPendingDebt</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudStack>
+
+    <!-- DataGrid for Top Transactions -->
+    <MudPaper Class="mt-4" Elevation="3">
+        <MudText Typo="Typo.h6" Class="mb-3">Top Transactions</MudText>
+        <MudDataGrid Items="@topTransactions" SortMode="SortMode.Multiple" Filterable="true">
+            <Columns>
+                <PropertyColumn Property="x => x.Title" Title="Title" Sortable="true" />
+                <PropertyColumn Property="x => x.Type" Title="Type" Sortable="true" />
+                <PropertyColumn Property="x => x.Amount" Title="@AmountTitle" Sortable="true" />
+                <PropertyColumn Property="x => x.Date" Title="Date" Sortable="true" Format="D" />
+                <PropertyColumn Property="x => x.Tag" Title="Tag" Sortable="true" />
+            </Columns>
+        </MudDataGrid>
+    </MudPaper>
+
+    <!-- DataGrid for Pending Debts -->
+    <MudPaper Class="mt-4" Elevation="3">
+        <MudText Typo="Typo.h6" Class="mb-3">Pending Debts</MudText>
+        <MudDataGrid Items="@pendingDebts" SortMode="SortMode.Multiple" Filterable="true">
+            <Columns>
+                <PropertyColumn Property="x => x.Title" Title="Title" Sortable="true" />
+                <PropertyColumn Property="x => x.Amount" Title="@AmountTitle" Sortable="true" />
+                <PropertyColumn Property="x => x.Date" Title="Date" Sortable="true" Format="D" />
+                <PropertyColumn Property="x => x.Source" Title="Source" Sortable="true" />
+                <PropertyColumn Property="x => x.DueDate" Title="Due Date" Sortable="true" Format="D" />
+                <PropertyColumn Property="x => x.Status" Title="Status" Sortable="true" />
+            </Columns>
+
+            <PagerContent>
+                <MudDataGridPager T="Debt" PageSizeOptions="[5, 10, 15, 20]" />
+            </PagerContent>
+        </MudDataGrid>
+    </MudPaper>
+</MudContainer>
+
+
+
+
+@code {
+    private User currentUser;
+    private string AmountTitle;
+
+    private float balance;
+    private float totalInflows;
+    private float totalOutflows;
+
+    private List<Transaction> topTransactions;
+
+    private float totalPendingDebt;
+    private List<Debt> pendingDebts;
+
+    protected override void OnInitialized()
+    {
+        currentUser = AuthService.GetUserFromFile();
+        AmountTitle = $"Amount ({currentUser.PreferredCurrency})";
+
+		topTransactions = TransactionService.GetAllTransactions().OrderByDescending(t => t.Amount).Take(5).ToList();
+		pendingDebts = DebtService.GetAllDebts().Where(d => d.IsPending).ToList();
+
+		totalPendingDebt = pendingDebts.Sum(d => d.Amount);
+
+		totalInflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Credit").Sum(t => t.Amount);
+		totalOutflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Debit").Sum(t => t.Amount);
+
+		balance = totalInflows + totalPendingDebt - totalOutflows;
+	}
 }

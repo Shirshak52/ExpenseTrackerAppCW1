@@ -2,6 +2,7 @@
 @using ExpenseTracker.Models;
 @using ExpenseTracker.Services;
 @inject ITransactionService TransactionService;
+@inject IDebtService DebtService;
 @inject IDialogService DialogService
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Forms;
@@ -85,6 +86,10 @@
             <MudItem xs="12" sm="6">
                 <MudNumericField Label="Amount" Variant="Variant.Outlined" @bind-Value="transaction.Amount" Class="mb-3" Required="true" />
                 <ValidationMessage For="@(() => transaction.Amount)" />
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <p>@errorMessage</p>
+                }
             </MudItem>
 
             <MudItem xs="12" sm="6">
@@ -93,13 +98,17 @@
             </MudItem>
 
             <MudItem xs="12" sm="6">
-                <MudSelect @bind-Value="@transaction.Tag" Label="Tag" Variant="Variant.Outlined" Required="true" Class="mb-3">
+                <MudAutocomplete T="string" 
+                                 @bind-Value="transaction.Tag" 
+                                 Label="Tag" 
+                                 Variant="Variant.Outlined" 
+                                 Class="mb-3" 
+                                 Required="true">
                     @foreach (var tag in tags)
                     {
                         <MudSelectItem Value="@tag">@tag</MudSelectItem>
                     }
-                </MudSelect>
-                <ValidationMessage For="@(() => transaction.Tag)" />
+                </MudAutocomplete>
             </MudItem>
 
             <MudItem xs="12">
@@ -129,6 +138,8 @@
     private string _selectedTag;
     private bool isAnyFilterApplied => !string.IsNullOrEmpty(_selectedTag) || !string.IsNullOrEmpty(_selectedType);
 
+    private string errorMessage;
+
     private List<Transaction> filteredTransactions
     {
         get
@@ -148,22 +159,32 @@
 
     private void AddNewTransaction()
     {
-        TransactionService.AddNewTransaction(transaction.Title,
-            transaction.Type,
-            transaction.Amount,
-            transaction.Date,
-            transaction.Tag,
-            transaction.Notes
-        );
+        var balance = GetBalance();
+        if (balance > transaction.Amount)
+        {
+            TransactionService.AddNewTransaction(transaction.Title,
+                transaction.Type,
+                transaction.Amount,
+                transaction.Date,
+                transaction.Tag,
+                transaction.Notes
+            );
 
-        // Reload transactions list
-        LoadTransactions();
+            // Reload transactions list
+            LoadTransactions();
 
-        // Reload tags list
-        LoadTags();
+            // Reload tags list
+            LoadTags();
 
-        // Ensure UI is updated
-        StateHasChanged();
+            transaction = new();
+
+            // Ensure UI is updated
+            StateHasChanged();
+        }
+        else
+        {
+            errorMessage = "Insufficient balance.";
+        }
     }
 
     private void LoadTransactions()
@@ -174,6 +195,16 @@
     private void LoadTags()
     {
         tags = TransactionService.GetAllTags().ToList();
+    }
+
+    private float GetBalance()
+    {
+        var totalPendingDebt = DebtService.GetAllDebts().Where(d => d.IsPending).ToList().Sum(d => d.Amount);
+        var totalInflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Credit").Sum(t => t.Amount);
+        var totalOutflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Debit").Sum(t => t.Amount);
+        var balance = totalInflows + totalPendingDebt - totalOutflows;
+
+        return balance;
     }
 
     protected override void OnInitialized()
