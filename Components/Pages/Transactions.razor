@@ -98,17 +98,13 @@
             </MudItem>
 
             <MudItem xs="12" sm="6">
-                <MudAutocomplete T="string" 
-                                 @bind-Value="transaction.Tag" 
-                                 Label="Tag" 
-                                 Variant="Variant.Outlined" 
-                                 Class="mb-3" 
-                                 Required="true">
-                    @foreach (var tag in tags)
-                    {
-                        <MudSelectItem Value="@tag">@tag</MudSelectItem>
-                    }
-                </MudAutocomplete>
+                <MudSelect @bind-Value="@transaction.Tag" Label="Tag" Variant="Variant.Outlined" Required="true" Class="mb-3">
+                    <MudSelectItem Value="@(string.Empty)">Select a Tag</MudSelectItem>
+                        @foreach (var tag in tags)
+                        {
+                            <MudSelectItem Value="@tag">@tag</MudSelectItem>
+                        }
+                </MudSelect>
             </MudItem>
 
             <MudItem xs="12">

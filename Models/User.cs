@@ -15,7 +15,7 @@ namespace ExpenseTracker.Models
         public string Username { get; set; }
 
         [Required(ErrorMessage = "Password cannot be empty.")]
-        [StringLength(15, MinimumLength = 8, ErrorMessage = "Password must be 5 to 15 characters long.")]
+        [StringLength(15, MinimumLength = 8, ErrorMessage = "Password must be 8 to 15 characters long.")]
         public string Password { get; set; }
 
         [Required(ErrorMessage = "A currency must be selected.")]
