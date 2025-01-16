@@ -58,5 +58,11 @@ namespace ExpenseTracker.Services
             var jsonDebts = JsonSerializer.Serialize(_debts);
             File.WriteAllText(_filePath, jsonDebts);
         }
+
+        public void ToggleIsPending(Debt debt)
+        {
+            debt.IsPending = false;
+            Flush();
+        }
     }
 }

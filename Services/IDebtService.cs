@@ -16,5 +16,7 @@ namespace ExpenseTracker.Services
 
         // Read
         public IEnumerable<Debt> GetAllDebts();
+
+        public void ToggleIsPending(Debt debt);
     }
 }

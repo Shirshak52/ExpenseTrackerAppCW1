@@ -17,8 +17,6 @@ namespace ExpenseTracker.Services
         // Read
         public IEnumerable<Transaction> GetAllTransactions();
 
-        public void AddNewTag(string Tag);
-
         public List<string> GetAllTags();
 
         public List<string> GetAllTypes();

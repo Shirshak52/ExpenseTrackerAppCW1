@@ -100,10 +100,10 @@
             <MudItem xs="12" sm="6">
                 <MudSelect @bind-Value="@transaction.Tag" Label="Tag" Variant="Variant.Outlined" Required="true" Class="mb-3">
                     <MudSelectItem Value="@(string.Empty)">Select a Tag</MudSelectItem>
-                        @foreach (var tag in tags)
-                        {
-                            <MudSelectItem Value="@tag">@tag</MudSelectItem>
-                        }
+                    @foreach (var tag in tags)
+                    {
+                        <MudSelectItem Value="@tag">@tag</MudSelectItem>
+                    }
                 </MudSelect>
             </MudItem>
 
@@ -156,7 +156,35 @@
     private void AddNewTransaction()
     {
         var balance = GetBalance();
-        if (balance > transaction.Amount)
+        if (transaction.Type == "Debit")
+        {
+            if (balance > transaction.Amount)
+            {
+                TransactionService.AddNewTransaction(transaction.Title,
+                    transaction.Type,
+                    transaction.Amount,
+                    transaction.Date,
+                    transaction.Tag,
+                    transaction.Notes
+                );
+
+                // Reload transactions list
+                LoadTransactions();
+
+                // Reload tags list
+                LoadTags();
+
+                transaction = new();
+
+                // Ensure UI is updated
+                StateHasChanged();
+            }
+            else
+            {
+                errorMessage = "Insufficient balance.";
+            }
+        }
+        else
         {
             TransactionService.AddNewTransaction(transaction.Title,
                 transaction.Type,
@@ -176,10 +204,6 @@
 
             // Ensure UI is updated
             StateHasChanged();
-        }
-        else
-        {
-            errorMessage = "Insufficient balance.";
         }
     }
 

@@ -13,7 +13,6 @@ namespace ExpenseTracker.Services
     public class TransactionService : ITransactionService
     {
         private readonly string _transactionsFilePath = Path.Combine(FileSystem.Current.AppDataDirectory, "transactions.json");
-        private readonly string _tagsFilePath = Path.Combine(FileSystem.Current.AppDataDirectory, "tags.json");
         private List<Transaction> _transactions;
         private List<string> _types;
         private List<string> _tags;
@@ -28,13 +27,7 @@ namespace ExpenseTracker.Services
         {
             Transaction newTransaction = new Transaction(Title, Type, Amount, Date, Tag, Notes);
             _transactions.Add(newTransaction);
-            FlushTransaction();
-        }
-
-        public void AddNewTag(string Tag)
-        {
-            _tags.Add(Tag);
-            FlushTag();
+            Flush();
         }
 
         // Get all transactions from the list, ordered by Date
@@ -60,31 +53,15 @@ namespace ExpenseTracker.Services
                 _transactions = new();
             }
 
-            if (File.Exists(_tagsFilePath))
-            {
-                var jsonTags = File.ReadAllText(_tagsFilePath);
-                _tags = JsonSerializer.Deserialize<List<string>>(jsonTags) ?? null;
-            }
-            else
-            {
-                _tags = Transaction.Tags;
-            }
-
             _types = Transaction.Types;
+            _tags = Transaction.Tags;
         }
 
         // Update the json file when a transaction is added
-        private void FlushTransaction()
+        private void Flush()
         {
             var jsonTransactions = JsonSerializer.Serialize(_transactions);
             File.WriteAllText(_transactionsFilePath, jsonTransactions);
-        }
-
-        // Update the json file when a custom tag is added
-        private void FlushTag()
-        {
-            var jsonTags = JsonSerializer.Serialize(_tags);
-            File.WriteAllText(_tagsFilePath, jsonTags);
         }
 
         public List<string> GetAllTags()
@@ -95,6 +72,5 @@ namespace ExpenseTracker.Services
         {
             return _types;
         }
-
     }
 }

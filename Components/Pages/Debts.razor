@@ -2,6 +2,7 @@
 @using ExpenseTracker.Models;
 @using ExpenseTracker.Services;
 @inject IDebtService DebtService;
+@inject ITransactionService TransactionService;
 @inject IDialogService DialogService
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Forms;
@@ -20,12 +21,7 @@
                 <PropertyColumn Property="x => x.Date" Sortable="true" Format="D" />
                 <PropertyColumn Property="x => x.Source" Sortable="true" />
                 <PropertyColumn Property="x => x.DueDate" Title="Due Date" Sortable="true" Format="D" />
-                <PropertyColumn Property="x => x.Status" Sortable="true" />
-                <TemplateColumn CellClass="d-flex justify-end">
-                    <CellTemplate>
-                        <MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary">Clear Debt</MudButton>
-                    </CellTemplate>
-                </TemplateColumn>
+                <PropertyColumn Property="x => x.Status" Title="Status" Sortable="true" />
             </Columns>
 
             <PagerContent>
@@ -83,9 +79,13 @@
 
 
 @code {
+    private string debtStatus;
+
     private Debt debt = new();
 
     private List<Debt> debts = new();
+
+    private float balance;
 
     private void AddNewDebt()
     {
@@ -111,5 +111,23 @@
     protected override void OnInitialized()
     {
         LoadDebts();
+        balance = GetBalance();
+    }
+
+    public void ClearDebt(Debt debt)
+    {
+        
+    }
+
+    public float GetBalance()
+    {
+        var pendingDebts = DebtService.GetAllDebts().Where(d => d.IsPending).ToList();
+        var totalPendingDebt = pendingDebts.Sum(d => d.Amount);
+
+        var totalInflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Credit").Sum(t => t.Amount);
+        var totalOutflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Debit").Sum(t => t.Amount);
+
+        var balance = totalInflows + totalPendingDebt - totalOutflows;
+        return balance;
     }
 }
