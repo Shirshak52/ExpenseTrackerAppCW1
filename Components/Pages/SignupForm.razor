@@ -8,17 +8,19 @@
 <MudCard Class="mx-auto mt-4 p-4" Style="max-width: 400px;">
     <MudCardContent>
         <!-- Form header -->
-        <MudText Typo="Typo.h5" Class="text-center mb-4">Signup</MudText>
+        <MudText Typo="Typo.h5" Class="text-center mb-4">Sign Up</MudText>
 
         <!-- Input fields -->
-        <EditForm Model="@user" OnValidSubmit="HandleLogin">
+        <EditForm Model="@user" OnValidSubmit="HandleSignup">
             <DataAnnotationsValidator />
 
             <!-- Username -->
-            <MudTextField @bind-Value="@user.Username" Label="Username" Variant="Variant.Outlined" Class="mb-3" />
+            <MudTextField @bind-Value="@user.Username" Label="Username" Variant="Variant.Outlined" Class="mb-3" Required="true" />
 
             <!-- Password -->
-            <MudTextField @bind-Value="@user.Password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" AdornmentAriaLabel="Show Password" Required="true" />
+            <MudTextField @bind-Value="@user.Password" Label="Password" Variant="Variant.Outlined" 
+            InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" 
+            OnAdornmentClick="TogglePasswordVisibility" AdornmentAriaLabel="Show Password" Required="true" />
 
             <!-- Preferred Currency -->
             <MudSelect @bind-Value="@user.PreferredCurrency" Label="Preferred Currency" Variant="Variant.Outlined" Class="mb-3">
@@ -29,7 +31,8 @@
             </MudSelect>
 
             <!-- Signup button -->
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" FullWidth="true">Sign Up</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" 
+            Color="Color.Primary" Class="mt-2" FullWidth="true">Sign Up</MudButton>
         </EditForm>
     </MudCardContent>
 </MudCard>
@@ -64,7 +67,7 @@
     }
 
     // Save the user details and navigate to 'Dashboard'
-    private void HandleLogin()
+    private void HandleSignup()
     {
         AuthService.SaveUser(user.Username, user.Password, user.PreferredCurrency);
         NavigationManager.NavigateTo("/dashboard");

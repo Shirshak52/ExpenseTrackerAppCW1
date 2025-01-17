@@ -102,7 +102,8 @@
 
             <!-- Transaction Date -->
             <MudItem xs="12" sm="6">
-                <MudDatePicker Label="Date (If not selected, today's date will be used)" Variant="Variant.Outlined" @bind-Date="transaction.Date" Class="mb-3" Required="true" />
+                <MudDatePicker Label="Date (If not selected, today's date will be used)" Variant="Variant.Outlined" 
+                @bind-Date="transaction.Date" Class="mb-3" Required="true" />
                 <ValidationMessage For="@(() => transaction.Date)" />
             </MudItem>
 
@@ -200,6 +201,7 @@
                 // Reload tags list
                 LoadTags();
 
+                // Reset the form
                 transaction = new();
 
                 // Ensure UI is updated

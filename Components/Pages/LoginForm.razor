@@ -14,10 +14,13 @@
         <MudForm>
 
             <!-- Password -->
-            <MudTextField @bind-Value="password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" AdornmentAriaLabel="Show Password" Required="true" />
+            <MudTextField @bind-Value="password" Label="Password" Variant="Variant.Outlined" 
+            InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" 
+            OnAdornmentClick="TogglePasswordVisibility" AdornmentAriaLabel="Show Password" Required="true" />
 
             <!-- Login button -->
-            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" OnClick="HandleLogin">Login</MudButton>
+            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" 
+            Color="Color.Primary" Class="mt-2" OnClick="HandleLogin">Login</MudButton>
         </MudForm>
 
         <!-- Error message (if password is invalid) -->
@@ -55,18 +58,25 @@
     // If password is valid, navigate to 'Dashboard', else show error message
     private void HandleLogin()
     {
-        bool isValid = AuthService.ValidateUser(password);
-
-        // Valid password
-        if (isValid)
+        if (!string.IsNullOrEmpty(password))
         {
-            NavigationManager.NavigateTo("/dashboard");
-        }
+            bool isValid = AuthService.ValidateUser(password);
 
-        // Invalid password
+            // Valid password
+            if (isValid)
+            {
+                NavigationManager.NavigateTo("/dashboard");
+            }
+
+            // Invalid password
+            else
+            {
+                errorMessage = "Invalid password.";
+            }
+        }
         else
         {
-            errorMessage = "Invalid password.";
+            errorMessage = "Password is mandatory";
         }
     }
 }
