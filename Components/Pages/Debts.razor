@@ -9,10 +9,14 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Collections.Generic
 
-<h1 class="text-center mb-5">My Debts</h1>
 
+<!-- Datagrid for Debts -->
 <MudPaper Elevation="2" Class="p-4 mb-4">
     <MudContainer>
+        
+        <!-- Header -->
+        <MudText Typo="Typo.h4" Class="text-center mb-5">My Debts</MudText>
+        
         <MudDataGrid Items="@debts" SortMode="SortMode.Multiple" Filterable="true">
 
             <Columns>
@@ -31,39 +35,49 @@
     </MudContainer>
 </MudPaper>
 
+<!-- Form to add new debts -->
 <MudPaper Elevation="2" Class="p-4 mt-3">
     <MudContainer>
+
+        <!-- Form header -->
         <MudText Typo="Typo.h6" Class="mb-3">Add New Debt</MudText>
 
+        <!-- Input fields -->
         <EditForm Model="@debt" OnValidSubmit="AddNewDebt">
             <DataAnnotationsValidator />
             <MudGrid>
+                <!-- Debt Title -->
                 <MudItem xs="12" sm="6" md="4">
                     <MudTextField Label="Title" Dense="true" Variant="Variant.Outlined" @bind-Value="debt.Title" Required="true" />
                     <ValidationMessage For="@(() => debt.Title)" />
                 </MudItem>
 
+                <!-- Debt Amount -->
                 <MudItem xs="12" sm="6" md="4">
                     <MudNumericField Label="Amount" Dense="true" Variant="Variant.Outlined" @bind-Value="debt.Amount" Required="true" />
                     <ValidationMessage For="@(() => debt.Amount)" />
                 </MudItem>
 
+                <!-- Debt Date -->
                 <MudItem xs="12" sm="6" md="4">
                     <MudDatePicker Label="Date" Dense="true" Variant="Variant.Outlined" @bind-Date="debt.Date" Required="true" />
                     <ValidationMessage For="@(() => debt.Date)" />
                 </MudItem>
 
+                <!-- Debt Source -->
                 <MudItem xs="12" sm="6" md="4">
                     <MudTextField Label="Source" Dense="true" Variant="Variant.Outlined" @bind-Value="debt.Source" Required="true" />
                     <ValidationMessage For="@(() => debt.Source)" />
                 </MudItem>
 
+                <!-- Debt Due Date -->
                 <MudItem xs="12" sm="6" md="4">
                     <MudDatePicker Label="Due Date" Dense="true" Variant="Variant.Outlined" @bind-Date="debt.DueDate" Required="true" />
                     <ValidationMessage For="@(() => debt.DateDifference)" />
                 </MudItem>
             </MudGrid>
 
+            <!-- Add button -->
             <div class="text-end mt-3">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" Class="px-5">
                     Add Debt
@@ -79,14 +93,19 @@
 
 
 @code {
-    private string debtStatus;
+    private Debt debt = new();  // For the 'Add New Debt' form
+    private List<Debt> debts = new();  // For storing all existing debts
 
-    private Debt debt = new();
+    private float balance;  // For checking balance before clearing a debt
 
-    private List<Debt> debts = new();
+    // Get the list of all debts from the JSON file, and calculate balance
+    protected override void OnInitialized()
+    {
+        LoadDebts();
+        balance = GetBalance();
+    }
 
-    private float balance;
-
+    // Add a new debt
     private void AddNewDebt()
     {
         DebtService.AddNewDebt(debt.Title,
@@ -96,37 +115,46 @@
             debt.DueDate
         );
 
-        // Reload transactions list
+        // Reload the list of debts
         LoadDebts();
 
         // Ensure UI is updated
         StateHasChanged();
     }
 
+    // Get a list of all debts from the JSON file
     private void LoadDebts()
     {
         debts = DebtService.GetAllDebts().ToList();
     }
 
-    protected override void OnInitialized()
-    {
-        LoadDebts();
-        balance = GetBalance();
-    }
-
+    // Clear a debt
     public void ClearDebt(Debt debt)
     {
-        
+        // Check if there is enough balance to clear debt
+        if (debt.Amount > balance)
+        {
+            // Show error message
+        }
+        else
+        {
+            // Set 'IsPending' to false
+            DebtService.ToggleIsPending(debt);
+        }
     }
 
+    // Calculate balance
     public float GetBalance()
     {
+        // Calculate the total pending debt
         var pendingDebts = DebtService.GetAllDebts().Where(d => d.IsPending).ToList();
         var totalPendingDebt = pendingDebts.Sum(d => d.Amount);
 
+        // Calculate total inflows and outflows
         var totalInflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Credit").Sum(t => t.Amount);
         var totalOutflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Debit").Sum(t => t.Amount);
 
+        // Calculate and return balance
         var balance = totalInflows + totalPendingDebt - totalOutflows;
         return balance;
     }

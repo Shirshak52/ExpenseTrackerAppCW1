@@ -5,15 +5,22 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<MudCard Class="mx-auto mt-4" Style="max-width: 400px;">
+<MudCard Class="mx-auto mt-4 p-4" Style="max-width: 400px;">
     <MudCardContent>
+        <!-- Form header -->
+        <MudText Typo="Typo.h5" Class="text-center mb-4">Login</MudText>
+
+        <!-- Input fields -->
         <MudForm>
 
+            <!-- Password -->
             <MudTextField @bind-Value="password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" AdornmentAriaLabel="Show Password" Required="true" />
 
-            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto d-block" OnClick="HandleLogin">Login</MudButton>
+            <!-- Login button -->
+            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" OnClick="HandleLogin">Login</MudButton>
         </MudForm>
 
+        <!-- Error message (if password is invalid) -->
         @if (!string.IsNullOrEmpty(errorMessage))
         {
             <MudText Class="text-danger mt-2">@errorMessage</MudText>
@@ -22,13 +29,13 @@
 </MudCard>
 
 @code {
-    private string password;
+    private string password;  // For binding to the input field value of the Login form
     private string errorMessage = string.Empty;
 
+    // For password visibility (toggling on/off) [Taken directly from MudBlazor's Website]
     private bool isShow;
     private InputType PasswordInput = InputType.Password;
     private string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-
     private void TogglePasswordVisibility()
     {
         @if (isShow)
@@ -45,20 +52,20 @@
         }
     }
 
-    // Handle login logic
+    // If password is valid, navigate to 'Dashboard', else show error message
     private void HandleLogin()
     {
         bool isValid = AuthService.ValidateUser(password);
 
-        // Successful login
+        // Valid password
         if (isValid)
         {
-            // Navigate to dashboard
             NavigationManager.NavigateTo("/dashboard");
         }
+
+        // Invalid password
         else
         {
-            // Invalid login (user credentials don't match)
             errorMessage = "Invalid password.";
         }
     }

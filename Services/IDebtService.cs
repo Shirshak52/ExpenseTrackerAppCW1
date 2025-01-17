@@ -11,12 +11,18 @@ namespace ExpenseTracker.Services
     {
         public void Initialize();
 
-        // Create
+        // CREATE
+        // Add new debt to JSON file
         public void AddNewDebt(string Title, float Amount, DateTime? Date, string Source, DateTime? DueDate);
 
-        // Read
+        
+        // READ
+        // Get list of all debts
         public IEnumerable<Debt> GetAllDebts();
 
+
+        // UPDATE
+        // Toggle 'IsPending' to clear a debt
         public void ToggleIsPending(Debt debt);
     }
 }

@@ -1,28 +1,21 @@
 ﻿@page "/dashboard"
-@using ExpenseTracker.Models;
-@using ExpenseTracker.Services;
-@inject IAuthService AuthService;
-@inject ITransactionService TransactionService;
-@inject IDebtService DebtService;
-@inject IDialogService DialogService
+@using ExpenseTracker.Models
+@using ExpenseTracker.Services
+@inject IAuthService AuthService
+@inject ITransactionService TransactionService
+@inject IDebtService DebtService
 @using MudBlazor
-@using Microsoft.AspNetCore.Components.Forms;
+@using Microsoft.AspNetCore.Components.Forms
 @using System.ComponentModel.DataAnnotations
 @using System.Collections.Generic
 
-<h3>Dashboard</h3>
-
-<!-- Balance -->
-<!-- Total Outflows -->
-<!-- Total Inflows -->
-
-<!-- Top transactions -->
-
-<!-- Top debts -->
-<!-- Total Pending Debts -->
 
 <MudContainer>
-    <!-- Cards for Balance, Total Inflows, Total Outflows, Total Pending Debt -->
+
+    <!-- Header -->
+    <MudText Typo="Typo.h4" Class="text-center mb-3">Dashboard</MudText>
+
+    <!-- Cards for displaying metrics -->
     <MudStack Direction="Row" Spacing="3">
         <!-- Balance Card -->
         <MudCard Class="d-flex justify-space-between" Elevation="3">
@@ -55,11 +48,30 @@
                 <MudText Typo="Typo.h4" Color="Color.Warning">@currentUser.PreferredCurrency @totalPendingDebt</MudText>
             </MudCardContent>
         </MudCard>
+
+        <!-- Total Number of Transactions Card -->
+        <MudCard Class="d-flex justify-space-between" Elevation="3">
+            <MudCardContent>
+                <MudText Typo="Typo.h6">Total Number of Transactions</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Primary"> @totalNumOfTransactions</MudText>
+            </MudCardContent>
+        </MudCard>
+
+        <!-- Total Transactions Card -->
+        <MudCard Class="d-flex justify-space-between" Elevation="3">
+            <MudCardContent>
+                <MudText Typo="Typo.h6">Total Transactions</MudText>
+                <MudText Typo="Typo.h4" Color="Color.Warning">@currentUser.PreferredCurrency @totalTransactions</MudText>
+            </MudCardContent>
+        </MudCard>
     </MudStack>
 
     <!-- DataGrid for Top Transactions -->
-    <MudPaper Class="mt-4" Elevation="3">
-        <MudText Typo="Typo.h6" Class="mb-3">Top Transactions</MudText>
+    <MudPaper Class="mt-4 p-4" Elevation="3">
+        
+        <!-- Header -->
+        <MudText Typo="Typo.h6" Class="mb-3 text-center">Top Transactions</MudText>
+
         <MudDataGrid Items="@topTransactions" SortMode="SortMode.Multiple" Filterable="true">
             <Columns>
                 <PropertyColumn Property="x => x.Title" Title="Title" Sortable="true" />
@@ -72,8 +84,11 @@
     </MudPaper>
 
     <!-- DataGrid for Pending Debts -->
-    <MudPaper Class="mt-4" Elevation="3">
-        <MudText Typo="Typo.h6" Class="mb-3">Pending Debts</MudText>
+    <MudPaper Class="mt-4 p-4" Elevation="3">
+
+        <!-- Header -->
+        <MudText Typo="Typo.h6" Class="mb-3 text-center">Pending Debts</MudText>
+        
         <MudDataGrid Items="@pendingDebts" SortMode="SortMode.Multiple" Filterable="true">
             <Columns>
                 <PropertyColumn Property="x => x.Title" Title="Title" Sortable="true" />
@@ -95,31 +110,41 @@
 
 
 @code {
+    // For displaying user-chosen currency symbol
     private User currentUser;
     private string AmountTitle;
 
-    private float balance;
+    // Total inflows, outflows, pending debt, and balance
     private float totalInflows;
     private float totalOutflows;
-
-    private List<Transaction> topTransactions;
-
     private float totalPendingDebt;
+    private float balance;
+
+    // Total number of transactions and total transactions
+    private int totalNumOfTransactions;
+    private float totalTransactions;
+
+    // Top highest transactions and all pending debts
+    private List<Transaction> topTransactions;
     private List<Debt> pendingDebts;
 
+    // Fetch list of debts and transactions, and calculate all metrics
     protected override void OnInitialized()
     {
         currentUser = AuthService.GetUserFromFile();
         AmountTitle = $"Amount ({currentUser.PreferredCurrency})";
 
-		topTransactions = TransactionService.GetAllTransactions().OrderByDescending(t => t.Amount).Take(5).ToList();
-		pendingDebts = DebtService.GetAllDebts().Where(d => d.IsPending).ToList();
+        topTransactions = TransactionService.GetAllTransactions().OrderByDescending(t => t.Amount).Take(5).ToList();
+        pendingDebts = DebtService.GetAllDebts().Where(d => d.IsPending).ToList();
 
-		totalPendingDebt = pendingDebts.Sum(d => d.Amount);
+        totalPendingDebt = pendingDebts.Sum(d => d.Amount);
 
-		totalInflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Credit").Sum(t => t.Amount);
-		totalOutflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Debit").Sum(t => t.Amount);
+        totalInflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Credit").Sum(t => t.Amount);
+        totalOutflows = TransactionService.GetAllTransactions().Where(t => t.Type == "Debit").Sum(t => t.Amount);
 
-		balance = totalInflows + totalPendingDebt - totalOutflows;
-	}
+        balance = totalInflows + totalPendingDebt - totalOutflows;
+
+        totalNumOfTransactions = TransactionService.GetAllTransactions().Count();
+        totalTransactions = TransactionService.GetAllTransactions().Sum(t => t.Amount);
+    }
 }

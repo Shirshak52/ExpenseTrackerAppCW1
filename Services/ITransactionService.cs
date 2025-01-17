@@ -11,14 +11,19 @@ namespace ExpenseTracker.Services
     {
         public void Initialize();
 
-        // Create
+        // CREATE
+        // Add new transaction to JSON file
         public void AddNewTransaction(string Title, string Type, float Amount, DateTime? Date, string Tag, string Notes);
 
-        // Read
+
+        // READ
+        // Get list of all transactions
         public IEnumerable<Transaction> GetAllTransactions();
 
+        // Get list of available tags
         public List<string> GetAllTags();
 
+        // Get list of types
         public List<string> GetAllTypes();
     }
 }

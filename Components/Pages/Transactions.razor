@@ -9,16 +9,19 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Collections.Generic
 
-<h1 class="text-center mb-5">My Transactions</h1>
-
-<!-- Transactions View Start -->
+<!-- Datagrid for Transactions -->
 <MudPaper Elevation="2" Class="p-4">
 
-    <MudDataGrid Items="@(isAnyFilterApplied ? filteredTransactions : transactions)" SortMode="SortMode.Multiple" Filterable="true">
+    <!-- Header -->
+    <MudText Typo="Typo.h4" Class="text-center mb-5">My Transactions</MudText>
 
+    <!-- If any filter is applied, show filtered transactions, else show all transactions -->
+    <MudDataGrid Items="@(isAnyFilterApplied ? filteredTransactions : transactions)" SortMode="SortMode.Multiple" Filterable="true">
+        
+        <!-- Filtering buttons -->
         <ToolBarContent>
 
-            <!-- Tag Filter -->
+            <!-- Tag filter -->
             <MudSelect @bind-Value="_selectedTag" Label="Filter by Tag" Variant="Variant.Outlined" Class="mb-3" T="string">
                 <MudSelectItem Value="@(string.Empty)">All</MudSelectItem>
                 @foreach (var tag in tags)
@@ -27,7 +30,7 @@
                 }
             </MudSelect>
 
-            <!-- Type Filter -->
+            <!-- Type filter -->
             <MudSelect @bind-Value="_selectedType" Label="Filter by Type" Variant="Variant.Outlined" Class="mb-3" T="string">
                 <MudSelectItem Value="@(string.Empty)">All</MudSelectItem>
                 @foreach (var type in transactionTypes)
@@ -36,13 +39,14 @@
                 }
             </MudSelect>
 
-            <!-- Reset Filters -->
+            <!-- Reset filters -->
             <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="mb-3" OnClick="ResetFilters">
                 Reset Filters
             </MudButton>
 
         </ToolBarContent>
 
+        <!-- Datagrid columns -->
         <Columns>
             <PropertyColumn Property="x => x.Title" Sortable="true" />
             <PropertyColumn Property="x => x.Type" Sortable="true" />
@@ -58,21 +62,24 @@
     </MudDataGrid>
 </MudPaper>
 
-<!-- Add New Transaction Form Start -->
+<!-- Form to add new transactions -->
 <MudPaper Elevation="2" Class="p-4 mt-5">
-    <!-- Form Header -->
+
+    <!-- Form header -->
     <MudText Typo="Typo.h6" Class="mb-4">Add New Transaction</MudText>
 
+    <!-- Input fields -->
     <EditForm Model="@transaction" OnValidSubmit="AddNewTransaction">
         <DataAnnotationsValidator />
-        @* <ValidationSummary /> *@
 
         <MudGrid>
+            <!-- Transaction Title -->
             <MudItem xs="12" sm="6">
                 <MudTextField Label="Title" Variant="Variant.Outlined" @bind-Value="transaction.Title" Class="mb-3" Required="true" />
                 <ValidationMessage For="@(() => transaction.Title)" />
             </MudItem>
 
+            <!-- Transaction Type -->
             <MudItem xs="12" sm="6">
                 <MudSelect @bind-Value="@transaction.Type" Label="Type" Variant="Variant.Outlined" Required="true" Class="mb-3">
                     @foreach (var type in transactionTypes)
@@ -83,6 +90,7 @@
                 <ValidationMessage For="@(() => transaction.Type)" />
             </MudItem>
 
+            <!-- Transaction Amount -->
             <MudItem xs="12" sm="6">
                 <MudNumericField Label="Amount" Variant="Variant.Outlined" @bind-Value="transaction.Amount" Class="mb-3" Required="true" />
                 <ValidationMessage For="@(() => transaction.Amount)" />
@@ -92,11 +100,13 @@
                 }
             </MudItem>
 
+            <!-- Transaction Date -->
             <MudItem xs="12" sm="6">
                 <MudDatePicker Label="Date (If not selected, today's date will be used)" Variant="Variant.Outlined" @bind-Date="transaction.Date" Class="mb-3" Required="true" />
                 <ValidationMessage For="@(() => transaction.Date)" />
             </MudItem>
 
+            <!-- Transaction Tag -->
             <MudItem xs="12" sm="6">
                 <MudSelect @bind-Value="@transaction.Tag" Label="Tag" Variant="Variant.Outlined" Required="true" Class="mb-3">
                     <MudSelectItem Value="@(string.Empty)">Select a Tag</MudSelectItem>
@@ -107,13 +117,15 @@
                 </MudSelect>
             </MudItem>
 
+            <!-- Transaction Notes -->
             <MudItem xs="12">
-                <MudTextField Label="Notes" Variant="Variant.Outlined" @bind-Value="transaction.Notes" Multiline="true" Rows="3" Class="mb-3" />
+                <MudTextField Label="Notes (Optional)" Variant="Variant.Outlined" @bind-Value="transaction.Notes" Multiline="true" Rows="3" Class="mb-3" />
                 <ValidationMessage For="@(() => transaction.Notes)" />
             </MudItem>
         </MudGrid>
 
-        <div class="text-end">
+        <!-- Add button -->
+        <div class="text-end mt-3">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit" Class="mt-3 px-5">
                 Add Transaction
             </MudButton>
@@ -123,19 +135,22 @@
 
 
 @code {
-    private Transaction transaction = new();
+    private Transaction transaction = new();  // For the 'Add New Transaction' form
+    
+    private List<Transaction> transactions = new();  // For storing all existing transactions
+    private List<string> tags = new();  // For storing all available tags
+    private List<string> transactionTypes => TransactionService.GetAllTypes();  // For storing all availabe types (i.e., Debit and Credit)
 
-    private List<Transaction> transactions = new();
+    // For filtering
+    private string _selectedType;  // For filtering by type
+    private string _selectedTag;  // For filtering by tag
 
-    private List<string> tags = new();
-    private List<string> transactionTypes => TransactionService.GetAllTypes();
-
-    private string _selectedType;
-    private string _selectedTag;
+    // For checking to see if any filters are applied
     private bool isAnyFilterApplied => !string.IsNullOrEmpty(_selectedTag) || !string.IsNullOrEmpty(_selectedType);
 
     private string errorMessage;
 
+    // For filtering transactions and storing them
     private List<Transaction> filteredTransactions
     {
         get
@@ -147,18 +162,29 @@
         }
     }
 
+    // For resetting filters
     private void ResetFilters()
     {
         _selectedTag = string.Empty;
         _selectedType = string.Empty;
     }
 
+    // Get the list of all transactions from the JSON file, and the list of available tags
+    protected override void OnInitialized()
+    {
+        LoadTransactions();
+        LoadTags();
+    }
+
+    // For adding a transaction
     private void AddNewTransaction()
     {
+        // Calculate balance to check if enough left for outflow (debit)
         var balance = GetBalance();
+
         if (transaction.Type == "Debit")
         {
-            if (balance > transaction.Amount)
+            if (balance >= transaction.Amount)
             {
                 TransactionService.AddNewTransaction(transaction.Title,
                     transaction.Type,
@@ -207,16 +233,19 @@
         }
     }
 
+    // Get a list of all transactions from the JSON file
     private void LoadTransactions()
     {
         transactions = TransactionService.GetAllTransactions().ToList();
     }
 
+    // Get a list of all available tags
     private void LoadTags()
     {
         tags = TransactionService.GetAllTags().ToList();
     }
 
+    // Calculate balance
     private float GetBalance()
     {
         var totalPendingDebt = DebtService.GetAllDebts().Where(d => d.IsPending).ToList().Sum(d => d.Amount);
@@ -227,9 +256,4 @@
         return balance;
     }
 
-    protected override void OnInitialized()
-    {
-        LoadTransactions();
-        LoadTags();
-    }
 }

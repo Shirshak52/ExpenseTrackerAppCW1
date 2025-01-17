@@ -7,13 +7,20 @@
 
 <MudCard Class="mx-auto mt-4 p-4" Style="max-width: 400px;">
     <MudCardContent>
+        <!-- Form header -->
+        <MudText Typo="Typo.h5" Class="text-center mb-4">Signup</MudText>
+
+        <!-- Input fields -->
         <EditForm Model="@user" OnValidSubmit="HandleLogin">
             <DataAnnotationsValidator />
-            <ValidationSummary Class="mb-3" />
 
+            <!-- Username -->
             <MudTextField @bind-Value="@user.Username" Label="Username" Variant="Variant.Outlined" Class="mb-3" />
+
+            <!-- Password -->
             <MudTextField @bind-Value="@user.Password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TogglePasswordVisibility" AdornmentAriaLabel="Show Password" Required="true" />
 
+            <!-- Preferred Currency -->
             <MudSelect @bind-Value="@user.PreferredCurrency" Label="Preferred Currency" Variant="Variant.Outlined" Class="mb-3">
                 @foreach (var currency in currencies)
                 {
@@ -21,20 +28,25 @@
                 }
             </MudSelect>
 
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" FullWidth="true">Login</MudButton>
+            <!-- Signup button -->
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2" FullWidth="true">Sign Up</MudButton>
         </EditForm>
     </MudCardContent>
 </MudCard>
 
 @code {
-    private User user = new User();
-    private string errorMessage = string.Empty;
+    private User user = new User();  // For the Signup form
+
+    // For storing the list of avaliable currencies
     private List<string> currencies => AuthService.GetAvailableCurrencies();
 
+    private string errorMessage = string.Empty;
+
+
+    // For password visibility (toggling on/off) [Taken directly from MudBlazor's Website]
     private bool isShow;
     private InputType PasswordInput = InputType.Password;
     private string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-
     private void TogglePasswordVisibility()
     {
         @if (isShow)
@@ -51,12 +63,10 @@
         }
     }
 
+    // Save the user details and navigate to 'Dashboard'
     private void HandleLogin()
     {
-        // Save the user credentials
         AuthService.SaveUser(user.Username, user.Password, user.PreferredCurrency);
-
-        // Navigate to dashboard
         NavigationManager.NavigateTo("/dashboard");
     }
 }

@@ -9,47 +9,57 @@ namespace ExpenseTracker.Models
 {
     public class Transaction
     {
+        // ID
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        // Title
         [Required(ErrorMessage = "Please enter a title.")]
         public string Title { get; set; }
 
+        // Type
         [Required(ErrorMessage = "Please select a type.")]
         public string Type { get; set; }
 
+        // Amount
         [Required(ErrorMessage = "Please enter an amount.")]
-        [Range(1, 1000000, ErrorMessage = "Amount must be between 1 and 1,000,000.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Amount must be greater than 0.")]
         public float Amount { get; set; }
 
+        // Date
         [Required(ErrorMessage = "Please select a date.")]
         [Range(typeof(DateTime), "1/1/1900", "12/31/2100", ErrorMessage = "Date must be between January 1, 1900 and December 31, 2100.")]
         public DateTime? Date { get; set; }
 
+        // Tag
         [Required(ErrorMessage = "Please provide a tag.")]
         public string Tag { get; set; }
 
+        // Notes
         public string Notes { get; set; }
 
+        // List of Transaction Types
         public static List<string> Types = new List<string>
         {
             "Credit",
             "Debit"
         };
 
+        // List of Available Tags
         public static List<string> Tags = new List<string>
         {
-            "Yearly",
-            "Monthly",
-            "Food",
-            "Drinks",
             "Clothes",
+            "Drinks",
+            "EMI",
+            "Food",
+            "Fuel",
             "Gadgets",
             "Miscellaneous",
-            "Fuel",
-            "EMI",
-            "Party"
+            "Monthly",
+            "Party",
+            "Yearly"
         };
 
+        // Constructors
         public Transaction(string Title, string Type, float Amount, DateTime? Date, string Tag, string Notes)
         {
             this.Id = Guid.NewGuid();

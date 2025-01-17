@@ -1,5 +1,5 @@
 ﻿@page "/"
-@layout Layout.LoginLayout
+@layout Layout.AuthLayout
 @using ExpenseTracker.Models
 @using ExpenseTracker.Services
 @using Microsoft.AspNetCore.Components.Forms
@@ -7,24 +7,24 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<MudCard Class="mx-auto mt-5" Style="max-width: 400px;">
-    <MudCardContent>
-        <h1 class="text-center mb-4">Login</h1>
 
-        @if (isNewUser)
-        {
-            <NewUserLoginForm />
-        }
-        else
-        {
-            <ExistingUserLoginForm />
-        }
-    </MudCardContent>
-</MudCard>
+
+@if (isNewUser)
+{
+    <!-- If user does not exist (i.e., a new user) show Signup form -->
+    <SignupForm />
+}
+else
+{
+    <!-- If user exists, show Login form -->
+    <LoginForm />
+}
+
 
 @code {
     private bool isNewUser;
 
+    // Check if a user already exists
     protected override void OnInitialized()
     {
         isNewUser = !AuthService.UserExists();
