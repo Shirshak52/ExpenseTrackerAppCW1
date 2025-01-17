@@ -81,7 +81,7 @@
 
             <!-- Transaction Type -->
             <MudItem xs="12" sm="6">
-                <MudSelect @bind-Value="@transaction.Type" Label="Type" Variant="Variant.Outlined" Required="true" Class="mb-3">
+                <MudSelect @bind-Value="@transaction.Type" Label="Type" Variant="Variant.Outlined" Class="mb-3" Required="true" >
                     @foreach (var type in transactionTypes)
                     {
                         <MudSelectItem Value="@type">@type</MudSelectItem>
@@ -109,7 +109,7 @@
 
             <!-- Transaction Tag -->
             <MudItem xs="12" sm="6">
-                <MudSelect @bind-Value="@transaction.Tag" Label="Tag" Variant="Variant.Outlined" Required="true" Class="mb-3">
+                <MudSelect @bind-Value="@transaction.Tag" Label="Tag" Variant="Variant.Outlined" Class="mb-3" Required="true" >
                     <MudSelectItem Value="@(string.Empty)">Select a Tag</MudSelectItem>
                     @foreach (var tag in tags)
                     {

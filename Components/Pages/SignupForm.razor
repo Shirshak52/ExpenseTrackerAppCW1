@@ -23,7 +23,7 @@
             OnAdornmentClick="TogglePasswordVisibility" AdornmentAriaLabel="Show Password" Required="true" />
 
             <!-- Preferred Currency -->
-            <MudSelect @bind-Value="@user.PreferredCurrency" Label="Preferred Currency" Variant="Variant.Outlined" Class="mb-3">
+            <MudSelect @bind-Value="@user.PreferredCurrency" Label="Preferred Currency" Variant="Variant.Outlined" Class="mb-3" Required="true">
                 @foreach (var currency in currencies)
                 {
                     <MudSelectItem Value="@currency">@currency</MudSelectItem>
